@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, send_file
 from flask_cors import CORS
 import threading
 import time
@@ -7,7 +7,7 @@ import re
 from datetime import datetime
 from playwright.sync_api import sync_playwright
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
 atm_data = {"terminals": [], "alerts": [], "last_updated": None, "errors": []}
@@ -52,7 +52,6 @@ def scrape_myterminals(user, pwd):
                 if not cells or all(c=="" for c in cells): continue
                 if any("terminal id" in c.lower() for c in cells):
                     header_row = cells
-                    print(f"MT header: {cells}")
                 elif header_row and len(cells) >= 5:
                     data_rows.append(cells)
             if header_row:
@@ -65,7 +64,6 @@ def scrape_myterminals(user, pwd):
                         if "$" in cell:
                             amount_idx = i
                             break
-                print(f"MT cols - id:{id_idx} name:{name_idx} amount:{amount_idx}")
                 for cells in data_rows:
                     if len(cells) < 3: continue
                     terminal_id = cells[id_idx] if id_idx < len(cells) else ""
@@ -186,8 +184,18 @@ def index():
 
 @app.route("/Cyber_25.jpg")
 def logo():
-    with open("Cyber_25.jpg", "rb") as f:
-        return Response(f.read(), mimetype="image/jpeg")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    paths_to_try = [
+        os.path.join(base_dir, "Cyber_25.jpg"),
+        "Cyber_25.jpg",
+        "/app/Cyber_25.jpg",
+    ]
+    for path in paths_to_try:
+        if os.path.exists(path):
+            print(f"Serving logo from: {path}")
+            return send_file(path, mimetype="image/jpeg")
+    print(f"Logo not found. Tried: {paths_to_try}")
+    return Response("Logo not found", status=404)
 
 @app.route("/api/data")
 def get_data():
