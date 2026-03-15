@@ -9,11 +9,7 @@
 <title>ATM Monitor</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#080c10;--card:#0f1520;--card2:#151d2a;--border:#1e2d40;
-  --green:#00ff88;--yellow:#ffd000;--red:#ff2d55;--blue:#0af;
-  --text:#e8f4ff;--muted:#4a6380;--r:14px;
-}
+:root{--bg:#080c10;--card:#0f1520;--card2:#151d2a;--border:#1e2d40;--green:#00ff88;--yellow:#ffd000;--red:#ff2d55;--blue:#0af;--text:#e8f4ff;--muted:#4a6380;--r:14px;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100dvh;}
 .header{position:sticky;top:0;z-index:50;background:rgba(8,12,16,0.93);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,44px) 20px 0;}
@@ -76,15 +72,15 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .save-btn{width:100%;padding:16px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green) 0%,var(--blue) 100%);color:#000;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;transition:opacity 0.2s;margin-top:4px;}
 .save-btn:active{opacity:0.75;}
 .info-box{background:rgba(0,170,255,0.06);border:1px solid rgba(0,170,255,0.2);border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.7;color:#7ab8d4;margin-bottom:14px;}
+.next-refresh{font-size:10px;color:var(--muted);text-align:center;padding:4px 0 8px;}
 </style>
 </head>
 <body>
-
 <div class="header">
   <div class="header-inner">
     <div class="logo">ATM Monitor</div>
     <div class="header-right">
-      <div class="sync-time" id="syncTime">Jamais sync</div>
+      <div class="sync-time" id="syncTime">Chargement...</div>
       <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()">↻</button>
     </div>
   </div>
@@ -94,12 +90,11 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
     <button class="tab" onclick="setFilter('perativ',this)">Perativ</button>
   </div>
 </div>
-
 <div id="dashView">
   <div class="stats">
-    <div class="stat s-total"><div class="stat-num c-blue"   id="sTotal">—</div><div class="stat-lbl">Total</div></div>
-    <div class="stat s-low">  <div class="stat-num c-yellow" id="sLow">—</div><div class="stat-lbl">Bas</div></div>
-    <div class="stat s-empty"><div class="stat-num c-red"    id="sEmpty">—</div><div class="stat-lbl">Vides</div></div>
+    <div class="stat s-total"><div class="stat-num c-blue" id="sTotal">—</div><div class="stat-lbl">Total</div></div>
+    <div class="stat s-low"><div class="stat-num c-yellow" id="sLow">—</div><div class="stat-lbl">Bas</div></div>
+    <div class="stat s-empty"><div class="stat-num c-red" id="sEmpty">—</div><div class="stat-lbl">Vides</div></div>
   </div>
   <div class="alert-banner" id="alertBanner">
     <div class="alert-header">⚠️ Alertes actives</div>
@@ -108,18 +103,16 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
   <div class="search-wrap">
     <input class="search-input" type="search" placeholder="🔍 Rechercher..." id="searchBox" oninput="renderList()">
   </div>
+  <div class="next-refresh" id="nextRefresh"></div>
   <div class="list" id="termList">
     <div class="state-box">
-      <div class="state-icon">⚙️</div>
-      <div class="state-text">Configure tes accès<br>dans l'onglet <strong>Réglages</strong></div>
+      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="state-text">Chargement...</div>
     </div>
   </div>
 </div>
-
 <div class="settings" id="settingsView">
-  <div class="info-box">
-    ℹ️ Tes identifiants sont sauvegardés <strong>uniquement sur cet appareil</strong>. L'app se connecte à ton serveur Railway pour récupérer les données.
-  </div>
+  <div class="info-box">ℹ️ Tes identifiants sont sauvegardés uniquement sur cet appareil. L'app se rafraîchit automatiquement toutes les 5 minutes.</div>
   <div class="set-card">
     <div class="set-title">🏧 MyTerminals</div>
     <div class="field"><label>Nom d'utilisateur</label><input type="text" id="mtUser" autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="ex: MAFLeeP"></div>
@@ -127,7 +120,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
   </div>
   <div class="set-card">
     <div class="set-title">💻 Perativ</div>
-    <div class="field"><label>Nom d'utilisateur</label><input type="text" id="pvUser" autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="Username"></div>
+    <div class="field"><label>Nom d'utilisateur</label><input type="text" id="pvUser" autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="MARC-ANTOINE"></div>
     <div class="field"><label>Mot de passe</label><input type="password" id="pvPass" placeholder="••••••••"></div>
   </div>
   <div class="set-card">
@@ -136,154 +129,129 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
   </div>
   <button class="save-btn" onclick="saveSettings()">SAUVEGARDER</button>
 </div>
-
 <div class="nav">
   <button class="nav-btn active" id="navDash" onclick="showView('dash')"><span class="nav-icon">📊</span>Dashboard</button>
-  <button class="nav-btn" id="navSet"  onclick="showView('set')"><span class="nav-icon">⚙️</span>Réglages</button>
+  <button class="nav-btn" id="navSet" onclick="showView('set')"><span class="nav-icon">⚙️</span>Réglages</button>
 </div>
-
 <script>
-const SERVER = 'https://atm-monitor-production.up.railway.app';
-let terminals = [], activeFilter = 'all';
+const SERVER='https://atm-monitor-production.up.railway.app';
+let terminals=[],activeFilter='all',autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null;
 
-function loadSettings() {
-  try {
-    const s = JSON.parse(localStorage.getItem('atm_cfg') || '{}');
-    if (s.mtUser) document.getElementById('mtUser').value = s.mtUser;
-    if (s.mtPass) document.getElementById('mtPass').value = s.mtPass;
-    if (s.pvUser) document.getElementById('pvUser').value = s.pvUser;
-    if (s.pvPass) document.getElementById('pvPass').value = s.pvPass;
-    if (s.threshold !== undefined) document.getElementById('threshold').value = s.threshold;
+function loadSettings(){
+  try{
+    const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
+    if(s.mtUser)document.getElementById('mtUser').value=s.mtUser;
+    if(s.mtPass)document.getElementById('mtPass').value=s.mtPass;
+    if(s.pvUser)document.getElementById('pvUser').value=s.pvUser;
+    if(s.pvPass)document.getElementById('pvPass').value=s.pvPass;
+    if(s.threshold!==undefined)document.getElementById('threshold').value=s.threshold;
     return s;
-  } catch(e) { return {}; }
+  }catch(e){return{};}
 }
 
-function saveSettings() {
-  const s = {
-    mtUser: document.getElementById('mtUser').value.trim(),
-    mtPass: document.getElementById('mtPass').value,
-    pvUser: document.getElementById('pvUser').value.trim(),
-    pvPass: document.getElementById('pvPass').value,
-    threshold: parseInt(document.getElementById('threshold').value) || 500
-  };
-  localStorage.setItem('atm_cfg', JSON.stringify(s));
-  fetch(SERVER + '/api/credentials', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      myterminals: { username: s.mtUser, password: s.mtPass },
-      perativ:     { username: s.pvUser, password: s.pvPass },
-      threshold:   s.threshold
-    })
-  }).catch(console.error);
+function saveSettings(){
+  const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};
+  localStorage.setItem('atm_cfg',JSON.stringify(s));
+  fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);
   showView('dash');
-  setTimeout(doRefresh, 1500);
+  setTimeout(fetchData,2000);
 }
 
-function showView(v) {
-  document.getElementById('dashView').style.display = v==='dash' ? '' : 'none';
-  document.getElementById('settingsView').classList.toggle('show', v==='set');
-  document.getElementById('navDash').classList.toggle('active', v==='dash');
-  document.getElementById('navSet').classList.toggle('active',  v==='set');
+function showView(v){
+  document.getElementById('dashView').style.display=v==='dash'?'':'none';
+  document.getElementById('settingsView').classList.toggle('show',v==='set');
+  document.getElementById('navDash').classList.toggle('active',v==='dash');
+  document.getElementById('navSet').classList.toggle('active',v==='set');
 }
 
-function setFilter(f, btn) {
-  activeFilter = f;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   renderList();
 }
 
-async function doRefresh() {
-  const btn = document.getElementById('refreshBtn');
+async function fetchData(){
+  try{
+    const res=await fetch(SERVER+'/api/data');
+    const data=await res.json();
+    terminals=data.terminals||[];
+    const now=new Date();
+    document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});
+    renderList();renderStats(data);renderAlerts(data.alerts||[]);
+  }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
+}
+
+async function doRefresh(){
+  const btn=document.getElementById('refreshBtn');
   btn.classList.add('spinning');
   setLoading();
-  try {
-    await fetch(SERVER + '/api/refresh', { method:'POST' });
-    await new Promise(r => setTimeout(r, 5000));
-    const res  = await fetch(SERVER + '/api/data');
-    const data = await res.json();
-    terminals  = data.terminals || [];
-    const now  = new Date();
-    document.getElementById('syncTime').textContent =
-      `Sync ${now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})}`;
-    renderList();
-    renderStats(data);
-    renderAlerts(data.alerts || []);
-  } catch(e) {
-    document.getElementById('syncTime').textContent = '⚠️ Erreur';
-    document.getElementById('termList').innerHTML = `
-      <div class="state-box"><div class="state-icon">🔴</div>
-      <div class="state-text">Impossible de contacter le serveur.<br>${e.message}</div></div>`;
-  }
+  try{
+    await fetch(SERVER+'/api/refresh',{method:'POST'});
+    await new Promise(r=>setTimeout(r,8000));
+    await fetchData();
+  }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
   btn.classList.remove('spinning');
+  scheduleNextRefresh();
 }
 
-function setLoading() {
-  document.getElementById('termList').innerHTML = `
-    <div class="state-box">
-      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-      <div class="state-text">Connexion aux guichets...</div>
-    </div>`;
+function scheduleNextRefresh(){
+  if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
+  if(countdownTimer)clearInterval(countdownTimer);
+  const INTERVAL=5*60*1000;
+  nextRefreshTime=Date.now()+INTERVAL;
+  autoRefreshTimer=setTimeout(()=>{doRefresh();},INTERVAL);
+  countdownTimer=setInterval(()=>{
+    const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));
+    const min=Math.floor(remaining/60);
+    const sec=remaining%60;
+    document.getElementById('nextRefresh').textContent='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');
+    if(remaining===0)clearInterval(countdownTimer);
+  },1000);
 }
 
-function renderStats(data) {
-  const s = JSON.parse(localStorage.getItem('atm_cfg') || '{}');
-  const th = s.threshold || 500;
-  const t  = data.terminals || [];
-  document.getElementById('sTotal').textContent = t.length || '—';
-  document.getElementById('sLow').textContent   = t.length ? t.filter(x => x.amount>0 && x.amount<th).length : '—';
-  document.getElementById('sEmpty').textContent = t.length ? t.filter(x => x.amount===0).length : '—';
+function setLoading(){
+  document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="state-text">Connexion aux guichets...</div></div>';
 }
 
-function renderAlerts(alerts) {
-  const b = document.getElementById('alertBanner');
-  if (!alerts.length) { b.classList.remove('show'); return; }
+function renderStats(data){
+  const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
+  const th=s.threshold||500;
+  const t=data.terminals||[];
+  document.getElementById('sTotal').textContent=t.length||'—';
+  document.getElementById('sLow').textContent=t.length?t.filter(x=>x.amount>0&&x.amount<th).length:'—';
+  document.getElementById('sEmpty').textContent=t.length?t.filter(x=>x.amount===0).length:'—';
+}
+
+function renderAlerts(alerts){
+  const b=document.getElementById('alertBanner');
+  if(!alerts.length){b.classList.remove('show');return;}
   b.classList.add('show');
-  document.getElementById('alertItems').innerHTML =
-    alerts.map(a => `<div class="alert-item">${a.msg}</div>`).join('');
+  document.getElementById('alertItems').innerHTML=alerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');
 }
 
-function renderList() {
-  const s  = JSON.parse(localStorage.getItem('atm_cfg') || '{}');
-  const th = s.threshold || 500;
-  const q  = document.getElementById('searchBox').value.toLowerCase();
-  let list = terminals;
-  if (activeFilter !== 'all') list = list.filter(t => t.source === activeFilter);
-  if (q) list = list.filter(t => (t.name||'').toLowerCase().includes(q));
-  if (!list.length && !terminals.length) {
-    document.getElementById('termList').innerHTML = `
-      <div class="state-box"><div class="state-icon">⚙️</div>
-      <div class="state-text">Configure tes accès dans <strong>Réglages</strong><br>puis appuie sur ↻</div></div>`;
+function renderList(){
+  const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
+  const th=s.threshold||500;
+  const q=document.getElementById('searchBox').value.toLowerCase();
+  let list=terminals;
+  if(activeFilter!=='all')list=list.filter(t=>t.source===activeFilter);
+  if(q)list=list.filter(t=>(t.name||'').toLowerCase().includes(q));
+  if(!list.length&&!terminals.length){
+    document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">⚙️</div><div class="state-text">Configure tes accès dans <strong>Réglages</strong><br>puis appuie sur ↻</div></div>';
     return;
   }
-  if (!list.length) {
-    document.getElementById('termList').innerHTML = `
-      <div class="state-box"><div class="state-icon">🔍</div><div class="state-text">Aucun résultat</div></div>`;
+  if(!list.length){
+    document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">🔍</div><div class="state-text">Aucun résultat</div></div>';
     return;
   }
-  list.sort((a,b) => rank(a,th) - rank(b,th));
-  document.getElementById('termList').innerHTML = list.map(t => {
-    const amt = t.amount;
-    let st, cls, disp;
-    if (amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}
+  list.sort((a,b)=>rank(a,th)-rank(b,th));
+  document.getElementById('termList').innerHTML=list.map(t=>{
+    const amt=t.amount;
+    let st,cls,disp;
+    if(amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}
     else if(amt===0){st='empty';cls='empty';disp='$0';}
-    else if(amt<th){st='low';cls='low';disp=`$${amt.toLocaleString('fr-CA',{maximumFractionDigits:0})}`;}
-    else{st='ok';cls='ok';disp=`$${amt.toLocaleString('fr-CA',{maximumFractionDigits:0})}`;}
-    const src = t.source==='myterminals'?'MyTerminals':'Perativ';
-    return `<div class="card ${st}">
-      <div><div class="card-name">${t.name}</div><div class="card-source">${src}</div></div>
-      <div class="card-amount ${cls}">${disp}</div></div>`;
-  }).join('');
-}
-
-function rank(t,th){
-  if(t.amount===0)return 0;
-  if(t.amount!==null&&t.amount<th)return 1;
-  return 2;
-}
-
-loadSettings();
-doRefresh();
-</script>
-</body>
-</html>
+    else if(amt<th){st='low';cls='low';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}
+    else{st='ok';cls='ok';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}
+    const src=t.source==='myterminals'?'MyTerminals':'Perativ';
+    return '<div class="card '+st+'"><div><div class="card-name">'+t.name+'</div><div class="card-source">'+src+'</div></div><d
