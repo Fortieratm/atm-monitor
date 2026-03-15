@@ -32,6 +32,7 @@ def scrape_myterminals(user, pwd):
         browser = p.chromium.launch(headless=True, args=["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"])
         page = browser.new_page()
         try:
+            # Step 1: Login
             page.goto("https://secure.myterminals.com/SPS/login/login.aspx?ReturnUrl=%2FSPS%2Fdefault.aspx", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=15000)
             page.fill("input[type=text]", user)
@@ -40,39 +41,13 @@ def scrape_myterminals(user, pwd):
             page.wait_for_load_state("networkidle", timeout=15000)
             print(f"MT after login: {page.url}")
 
-            # Try multiple ways to click Terminal Management
-            clicked = False
-            for selector in [
-                "a:has-text('Terminal Management')",
-                "td:has-text('Terminal Management')",
-                "span:has-text('Terminal Management')",
-                "text=Terminal Management",
-                "//a[contains(text(),'Terminal Management')]",
-                "//td[contains(text(),'Terminal Management')]",
-            ]:
-                try:
-                    page.click(selector, timeout=5000)
-                    clicked = True
-                    print(f"MT clicked with: {selector}")
-                    break
-                except:
-                    continue
-
-            if not clicked:
-                print("MT could not click Terminal Management, trying all links")
-                links = page.query_selector_all("a")
-                for link in links:
-                    text = link.inner_text().strip()
-                    print(f"MT link: {text}")
-                    if "terminal" in text.lower() and "manage" in text.lower():
-                        link.click()
-                        clicked = True
-                        break
-
+            # Step 2: Go directly to Terminal Management
+            page.goto("https://secure.myterminals.com/SPS/addins/TerminalManager/Views.aspx", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=15000)
-            page.wait_for_timeout(2000)
+            page.wait_for_timeout(3000)
+            print(f"MT terminal page: {page.url}")
 
-            # Get table rows
+            # Step 3: Parse the table
             rows = page.query_selector_all("table tr")
             print(f"MT rows: {len(rows)}")
 
@@ -80,24 +55,28 @@ def scrape_myterminals(user, pwd):
                 headers = [th.inner_text().strip().lower() for th in rows[0].query_selector_all("th,td")]
                 print(f"MT headers: {headers}")
 
+                # Find column indices
+                id_idx   = next((i for i,h in enumerate(headers) if "terminal id" in h), 0)
                 name_idx = next((i for i,h in enumerate(headers) if "location" in h), 1)
                 amount_idx = next((i for i,h in enumerate(headers) if "total cassette" in h or "cassette value" in h), None)
-                id_idx = 0
+
+                print(f"MT cols - id:{id_idx} name:{name_idx} amount:{amount_idx}")
 
                 for row in rows[1:]:
                     cells = [td.inner_text().strip() for td in row.query_selector_all("td")]
                     if not cells or len(cells) < 2: continue
-                    name = cells[name_idx] if name_idx < len(cells) else cells[0]
                     terminal_id = cells[id_idx] if id_idx < len(cells) else ""
+                    name = cells[name_idx] if name_idx < len(cells) else cells[0]
                     amount = None
                     if amount_idx is not None and amount_idx < len(cells):
                         amount = find_amount(cells[amount_idx])
-                    terminals.append({
-                        "source": "myterminals",
-                        "name": name,
-                        "terminal_id": terminal_id,
-                        "amount": amount
-                    })
+                    if name:
+                        terminals.append({
+                            "source": "myterminals",
+                            "name": name,
+                            "terminal_id": terminal_id,
+                            "amount": amount
+                        })
 
             print(f"MT found: {len(terminals)}")
         except Exception as e:
@@ -115,11 +94,12 @@ def scrape_perativ(user, pwd):
             page.goto("https://webapps.perativ.com/Account/Login", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=10000)
             page.wait_for_timeout(2000)
+            print(f"PV login page: {page.url}")
 
-            for selector in ["input[name='UserName']", "input[type='text']", "#UserName", "input[placeholder*='ser']"]:
+            for selector in ["input[name='UserName']","input[type='text']","#UserName"]:
                 try:
                     page.fill(selector, user, timeout=5000)
-                    print(f"PV filled: {selector}")
+                    print(f"PV username filled: {selector}")
                     break
                 except: continue
 
@@ -133,7 +113,7 @@ def scrape_perativ(user, pwd):
 
             page.wait_for_load_state("networkidle", timeout=15000)
             page.wait_for_timeout(3000)
-            print(f"PV after login: {page.url}")
+            print(f"PV after login: {page.url} | title: {page.title()}")
 
             rows = page.query_selector_all("table tr")
             print(f"PV rows: {len(rows)}")
@@ -150,7 +130,8 @@ def scrape_perativ(user, pwd):
                     amount = None
                     if amount_idx is not None and amount_idx < len(cells):
                         amount = find_amount(cells[amount_idx])
-                    terminals.append({"source":"perativ","name":name,"amount":amount})
+                    if name:
+                        terminals.append({"source":"perativ","name":name,"amount":amount})
 
             print(f"PV found: {len(terminals)}")
         except Exception as e:
