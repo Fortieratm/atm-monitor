@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 import threading
+import time
 import os
 import re
 from datetime import datetime
@@ -32,68 +33,35 @@ def scrape_myterminals(user, pwd):
         browser = p.chromium.launch(headless=True, args=["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"])
         page = browser.new_page()
         try:
-            # Login
             page.goto("https://secure.myterminals.com/SPS/login/login.aspx?ReturnUrl=%2FSPS%2Fdefault.aspx", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=15000)
             page.fill("input[type=text]", user)
             page.fill("input[type=password]", pwd)
             page.click("input[type=submit]")
             page.wait_for_load_state("networkidle", timeout=15000)
-            print(f"MT after login: {page.url}")
-
-            # Go directly to Terminal Management page
             page.goto("https://secure.myterminals.com/SPS/addins/TerminalManager/Views.aspx", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=15000)
             page.wait_for_timeout(3000)
-            print(f"MT terminal page loaded")
-
-            # Parse rows individually using TD elements
             rows = page.query_selector_all("table tr")
-            print(f"MT rows: {len(rows)}")
-
             headers = []
             for i, row in enumerate(rows):
                 tds = row.query_selector_all("td")
                 cells = [td.inner_text().strip() for td in tds]
-                
-                # Skip empty rows
-                if not cells or all(c == "" for c in cells):
-                    continue
-                
-                # Header row
-                if i == 0 or (cells and "terminal id" in cells[0].lower()):
+                if not cells or all(c == "" for c in cells): continue
+                if not headers and any("terminal id" in c.lower() for c in cells):
                     headers = [c.lower() for c in cells]
-                    print(f"MT headers: {headers}")
                     continue
-                
-                # Skip rows that are clearly not data
-                if len(cells) < 5:
-                    continue
-                
-                # Find indices dynamically
-                if not headers:
-                    continue
-                    
+                if not headers or len(cells) < 5: continue
                 id_idx     = next((j for j,h in enumerate(headers) if "terminal id" in h), 0)
                 name_idx   = next((j for j,h in enumerate(headers) if "location" in h), 1)
                 amount_idx = next((j for j,h in enumerate(headers) if "total cassette" in h or ("cassette" in h and "value" in h)), None)
-                
                 terminal_id = cells[id_idx] if id_idx < len(cells) else ""
                 name = cells[name_idx] if name_idx < len(cells) else cells[0]
                 amount = None
-                
                 if amount_idx is not None and amount_idx < len(cells):
                     amount = find_amount(cells[amount_idx])
-                
-                # Only add real terminal rows (Terminal IDs start with T or letters)
-                if terminal_id and len(terminal_id) > 3 and not " " in terminal_id and name:
-                    terminals.append({
-                        "source": "myterminals",
-                        "name": name,
-                        "terminal_id": terminal_id,
-                        "amount": amount
-                    })
-
+                if terminal_id and len(terminal_id) > 3 and " " not in terminal_id and name:
+                    terminals.append({"source":"myterminals","name":name,"terminal_id":terminal_id,"amount":amount})
             print(f"MT found: {len(terminals)}")
         except Exception as e:
             print(f"MT error: {e}")
@@ -108,47 +76,55 @@ def scrape_perativ(user, pwd):
         page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36")
         try:
             page.goto("https://webapps.perativ.com/Account/Login", timeout=30000)
-            page.wait_for_load_state("networkidle", timeout=10000)
+            page.wait_for_load_state("networkidle", timeout=15000)
             page.wait_for_timeout(2000)
-
             for selector in ["input[name='UserName']","input[type='text']","#UserName"]:
                 try:
                     page.fill(selector, user, timeout=5000)
-                    print(f"PV username filled")
                     break
                 except: continue
-
             page.fill("input[type='password']", pwd)
-
-            for selector in ["button[type='submit']","input[type='submit']","button:has-text('Login')","button:has-text('Sign')"]:
+            for selector in ["button[type='submit']","input[type='submit']","button:has-text('Login')"]:
                 try:
                     page.click(selector, timeout=3000)
                     break
                 except: continue
-
-            page.wait_for_load_state("networkidle", timeout=15000)
-            page.wait_for_timeout(3000)
-            print(f"PV after login: {page.url}")
-
-            rows = page.query_selector_all("table tr")
+            page.wait_for_load_state("networkidle", timeout=20000)
+            page.wait_for_timeout(5000)
+            page.goto("https://webapps.perativ.com/portal/", timeout=30000)
+            page.wait_for_load_state("networkidle", timeout=20000)
+            page.wait_for_timeout(5000)
+            for selector in ["text=Terminal List","button:has-text('Terminal List')","a:has-text('Terminal List')"]:
+                try:
+                    page.click(selector, timeout=5000)
+                    break
+                except: continue
+            page.wait_for_timeout(4000)
+            rows = page.query_selector_all("table tr, .k-grid tr, [role='row']")
             headers = []
             for i, row in enumerate(rows):
-                tds = row.query_selector_all("td,th")
-                cells = [td.inner_text().strip() for td in tds]
+                cells_els = row.query_selector_all("td, th, [role='gridcell'], [role='columnheader']")
+                cells = [c.inner_text().strip() for c in cells_els]
                 if not cells or all(c=="" for c in cells): continue
-                if i == 0 or any("location" in c.lower() or "name" in c.lower() for c in cells):
+                if i == 0 or any(h in " ".join(cells).lower() for h in ["terminal","location","model"]):
                     headers = [c.lower() for c in cells]
                     continue
                 if not headers or len(cells) < 2: continue
-                name_idx   = next((j for j,h in enumerate(headers) if "location" in h or "name" in h), 0)
-                amount_idx = next((j for j,h in enumerate(headers) if "available" in h or "cash" in h or "balance" in h), None)
+                name_idx   = next((j for j,h in enumerate(headers) if "location" in h or "name" in h), 1)
+                amount_idx = next((j for j,h in enumerate(headers) if "txn" in h or "cash" in h or "$" in h), None)
                 name = cells[name_idx] if name_idx < len(cells) else cells[0]
                 amount = None
                 if amount_idx is not None and amount_idx < len(cells):
                     amount = find_amount(cells[amount_idx])
-                if name:
+                if amount is None:
+                    for cell in cells:
+                        if "$" in cell:
+                            amt = find_amount(cell)
+                            if amt is not None:
+                                amount = amt
+                                break
+                if name and name not in ["","Location","Terminal"]:
                     terminals.append({"source":"perativ","name":name,"amount":amount})
-
             print(f"PV found: {len(terminals)}")
         except Exception as e:
             print(f"PV error: {e}")
@@ -176,6 +152,12 @@ def refresh():
             elif amt < th: alerts.append({"type":"low","name":t["name"],"amount":amt,"msg":f"BAS: {t['name']} - ${amt:,.0f}"})
     atm_data = {"terminals":all_t,"alerts":alerts,"last_updated":datetime.now().isoformat(),"errors":errors}
     print(f"=== Done:{len(all_t)} terminals,{len(alerts)} alerts ===")
+
+def auto_refresh():
+    while True:
+        time.sleep(900)
+        try: refresh()
+        except Exception as e: print(f"Auto-refresh error: {e}")
 
 @app.route("/")
 def index():
@@ -207,4 +189,5 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     if os.environ.get("MT_USER") or os.environ.get("PV_USER"):
         threading.Thread(target=refresh, daemon=True).start()
+        threading.Thread(target=auto_refresh, daemon=True).start()
     app.run(host="0.0.0.0", port=port)
