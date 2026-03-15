@@ -367,4 +367,21 @@ function renderList(){
     return '<div class="card '+st+'">'
       +'<div class="card-info">'
         +'<div class="card-name">'+t.name+'</div>'
-        +'<div class="card-s
+        +'<div class="card-source">'+src+'</div>'
+        +'<div class="card-meta"><span>'+thLabel+'</span>'+(toOrderStr?'<span class="to-order">'+toOrderStr+'</span>':'')+'</div>'
+      +'</div>'
+      +'<button class="edit-btn" onclick="openModal(\''+id+'\',\''+eName+'\')">✏️ Seuil</button>'
+      +'<div class="card-amounts">'
+        +'<div class="card-amount '+cls+'">'+disp+'</div>'
+        +(toOrder>0?'<div class="card-order">+$'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'</div>':'')
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function rank(t,th){if(t.amount===0)return 0;if(t.amount!==null&&t.amount<th)return 1;return 2;}
+
+loadSettings();fetchData();scheduleNextRefresh();
+</script>
+</body>
+</html>
