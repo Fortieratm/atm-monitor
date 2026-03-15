@@ -42,27 +42,84 @@ def scrape_myterminals(user, pwd):
             page.goto("https://secure.myterminals.com/SPS/addins/TerminalManager/Views.aspx", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=15000)
             page.wait_for_timeout(3000)
+
+            # Get ALL table cells with their positions
             rows = page.query_selector_all("table tr")
-            headers = []
+            print(f"MT rows: {len(rows)}")
+
+            header_row = None
+            data_rows = []
+
             for i, row in enumerate(rows):
-                tds = row.query_selector_all("td")
+                tds = row.query_selector_all("td,th")
                 cells = [td.inner_text().strip() for td in tds]
-                if not cells or all(c == "" for c in cells): continue
-                if not headers and any("terminal id" in c.lower() for c in cells):
-                    headers = [c.lower() for c in cells]
+                if not cells or all(c=="" for c in cells):
                     continue
-                if not headers or len(cells) < 5: continue
-                id_idx     = next((j for j,h in enumerate(headers) if "terminal id" in h), 0)
-                name_idx   = next((j for j,h in enumerate(headers) if "location" in h), 1)
-                amount_idx = next((j for j,h in enumerate(headers) if "total cassette" in h or ("cassette" in h and "value" in h)), None)
-                terminal_id = cells[id_idx] if id_idx < len(cells) else ""
-                name = cells[name_idx] if name_idx < len(cells) else cells[0]
-                amount = None
-                if amount_idx is not None and amount_idx < len(cells):
-                    amount = find_amount(cells[amount_idx])
-                if terminal_id and len(terminal_id) > 3 and " " not in terminal_id and name:
-                    terminals.append({"source":"myterminals","name":name,"terminal_id":terminal_id,"amount":amount})
-            print(f"MT found: {len(terminals)}")
+                # Find header row - contains "Terminal ID"
+                if any("terminal id" in c.lower() for c in cells):
+                    header_row = cells
+                    print(f"MT header at row {i}: {cells}")
+                elif header_row and len(cells) >= 5:
+                    data_rows.append(cells)
+
+            if not header_row:
+                print("MT: no header found!")
+            else:
+                # Find exact column indices
+                headers_lower = [h.lower() for h in header_row]
+                print(f"MT headers: {headers_lower}")
+
+                id_idx = next((i for i,h in enumerate(headers_lower) if "terminal id" in h), 0)
+                name_idx = next((i for i,h in enumerate(headers_lower) if "location" in h), 1)
+
+                # Find Total Cassette Value column
+                amount_idx = None
+                for i, h in enumerate(headers_lower):
+                    if "total cassette" in h or ("cassette" in h and "value" in h):
+                        amount_idx = i
+                        break
+
+                # If not found by name, try to find column with $ values
+                if amount_idx is None:
+                    print("MT: 'total cassette value' not found in headers, trying to detect by $")
+                    # Check first data row for $ amounts
+                    if data_rows:
+                        for i, cell in enumerate(data_rows[0]):
+                            if "$" in cell:
+                                amount_idx = i
+                                print(f"MT: found $ at column {i}: {cell}")
+                                break
+
+                print(f"MT col indices - id:{id_idx} name:{name_idx} amount:{amount_idx}")
+
+                for cells in data_rows:
+                    if len(cells) < 3:
+                        continue
+                    terminal_id = cells[id_idx] if id_idx < len(cells) else ""
+                    name = cells[name_idx] if name_idx < len(cells) else cells[0]
+                    amount = None
+
+                    if amount_idx is not None and amount_idx < len(cells):
+                        amount = find_amount(cells[amount_idx])
+
+                    # Fallback: scan all cells for dollar amount
+                    if amount is None:
+                        for cell in cells:
+                            if "$" in cell:
+                                amt = find_amount(cell)
+                                if amt is not None:
+                                    amount = amt
+                                    break
+
+                    if terminal_id and len(terminal_id) > 3 and " " not in terminal_id:
+                        terminals.append({
+                            "source": "myterminals",
+                            "name": name,
+                            "terminal_id": terminal_id,
+                            "amount": amount
+                        })
+
+            print(f"MT found: {len(terminals)}, first amount: {terminals[0]['amount'] if terminals else 'none'}")
         except Exception as e:
             print(f"MT error: {e}")
         finally:
@@ -110,7 +167,7 @@ def scrape_perativ(user, pwd):
                     headers = [c.lower() for c in cells]
                     continue
                 if not headers or len(cells) < 2: continue
-                name_idx   = next((j for j,h in enumerate(headers) if "location" in h or "name" in h), 1)
+                name_idx = next((j for j,h in enumerate(headers) if "location" in h or "name" in h), 1)
                 amount_idx = next((j for j,h in enumerate(headers) if "txn" in h or "cash" in h or "$" in h), None)
                 name = cells[name_idx] if name_idx < len(cells) else cells[0]
                 amount = None
