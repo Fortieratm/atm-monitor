@@ -1,1 +1,291 @@
-atm-monitor.html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ATM Monitor">
+<title>ATM Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080c10;--card:#0f1520;--card2:#151d2a;--border:#1e2d40;
+  --green:#00ff88;--yellow:#ffd000;--red:#ff2d55;--blue:#0af;
+  --text:#e8f4ff;--muted:#4a6380;--r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100dvh;}
+.header{position:sticky;top:0;z-index:50;background:rgba(8,12,16,0.93);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,44px) 20px 0;}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.sync-time{font-size:10px;color:var(--muted);text-align:right;line-height:1.4;}
+.refresh-btn{width:40px;height:40px;border-radius:12px;background:var(--card2);border:1px solid var(--border);color:var(--green);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;}
+.refresh-btn:active{transform:scale(0.88);}
+.refresh-btn.spinning{animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.tabs{display:flex;gap:6px;padding-bottom:12px;}
+.tab{flex:1;padding:7px 4px;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.5px;}
+.tab.active{background:var(--card2);border-color:var(--green);color:var(--green);}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px 20px;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 10px;text-align:center;position:relative;overflow:hidden;}
+.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.stat.s-total::after{background:var(--blue);}.stat.s-low::after{background:var(--yellow);}.stat.s-empty::after{background:var(--red);}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;}
+.c-blue{color:var(--blue);}.c-yellow{color:var(--yellow);}.c-red{color:var(--red);}
+.stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+.alert-banner{margin:0 20px 12px;border-radius:var(--r);background:rgba(255,45,85,0.08);border:1px solid rgba(255,45,85,0.25);overflow:hidden;display:none;}
+.alert-banner.show{display:block;}
+.alert-header{padding:10px 14px;font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(255,45,85,0.15);}
+.alert-item{padding:8px 14px;font-size:12px;border-bottom:1px solid rgba(255,45,85,0.08);}
+.alert-item:last-child{border-bottom:none;}
+.search-wrap{padding:0 20px 12px;}
+.search-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:'Space Mono',monospace;font-size:13px;outline:none;transition:border-color 0.2s;}
+.search-input:focus{border-color:var(--blue);}
+.search-input::placeholder{color:var(--muted);}
+.list{padding:0 20px;padding-bottom:calc(80px + env(safe-area-inset-bottom));}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;overflow:hidden;transition:transform 0.15s;}
+.card:active{transform:scale(0.98);}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.card.ok::before{background:var(--green);}.card.low::before{background:var(--yellow);}.card.empty::before{background:var(--red);}
+.card.low{border-color:rgba(255,208,0,0.15);}.card.empty{border-color:rgba(255,45,85,0.2);background:rgba(255,45,85,0.04);}
+.card-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.card-source{font-size:10px;color:var(--muted);margin-top:3px;}
+.card-amount{font-family:'Bebas Neue',sans-serif;font-size:22px;flex-shrink:0;letter-spacing:1px;}
+.card-amount.ok{color:var(--green);}.card-amount.low{color:var(--yellow);}.card-amount.empty{color:var(--red);}.card-amount.na{color:var(--muted);font-size:14px;font-family:'Space Mono',monospace;}
+.state-box{text-align:center;padding:48px 20px;color:var(--muted);}
+.state-icon{font-size:52px;margin-bottom:14px;}
+.state-text{font-size:13px;line-height:1.7;}
+.dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:bounce 1.3s ease-in-out infinite;}
+.dot:nth-child(2){animation-delay:.15s;background:var(--blue);}.dot:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,80%,100%{transform:scale(0.5);opacity:0.3}40%{transform:scale(1);opacity:1}}
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,12,16,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:50;}
+.nav-btn{flex:1;padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;transition:color 0.2s;background:none;border:none;font-family:'Space Mono',monospace;}
+.nav-btn.active{color:var(--green);}
+.nav-icon{font-size:20px;}
+.settings{padding:16px 20px;padding-bottom:calc(90px + env(safe-area-inset-bottom));display:none;}
+.settings.show{display:block;}
+.set-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.set-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--blue);margin-bottom:14px;}
+.field{margin-bottom:12px;}.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}
+.field input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Space Mono',monospace;font-size:14px;outline:none;transition:border-color 0.2s;}
+.field input:focus{border-color:var(--green);}
+.save-btn{width:100%;padding:16px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green) 0%,var(--blue) 100%);color:#000;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;transition:opacity 0.2s;margin-top:4px;}
+.save-btn:active{opacity:0.75;}
+.info-box{background:rgba(0,170,255,0.06);border:1px solid rgba(0,170,255,0.2);border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.7;color:#7ab8d4;margin-bottom:14px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">ATM Monitor</div>
+    <div class="header-right">
+      <div class="sync-time" id="syncTime">Jamais sync</div>
+      <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()">↻</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="setFilter('all',this)">Tous</button>
+    <button class="tab" onclick="setFilter('myterminals',this)">MyTerminals</button>
+    <button class="tab" onclick="setFilter('perativ',this)">Perativ</button>
+  </div>
+</div>
+
+<div id="dashView">
+  <div class="stats">
+    <div class="stat s-total"><div class="stat-num c-blue"   id="sTotal">—</div><div class="stat-lbl">Total</div></div>
+    <div class="stat s-low">  <div class="stat-num c-yellow" id="sLow">—</div><div class="stat-lbl">Bas</div></div>
+    <div class="stat s-empty"><div class="stat-num c-red"    id="sEmpty">—</div><div class="stat-lbl">Vides</div></div>
+  </div>
+  <div class="alert-banner" id="alertBanner">
+    <div class="alert-header">⚠️ Alertes actives</div>
+    <div id="alertItems"></div>
+  </div>
+  <div class="search-wrap">
+    <input class="search-input" type="search" placeholder="🔍 Rechercher..." id="searchBox" oninput="renderList()">
+  </div>
+  <div class="list" id="termList">
+    <div class="state-box">
+      <div class="state-icon">⚙️</div>
+      <div class="state-text">Configure tes accès<br>dans l'onglet <strong>Réglages</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="settings" id="settingsView">
+  <div class="info-box">
+    ℹ️ Tes identifiants sont sauvegardés <strong>uniquement sur cet appareil</strong>. L'app se connecte à ton serveur Railway pour récupérer les données.
+  </div>
+  <div class="set-card">
+    <div class="set-title">🏧 MyTerminals</div>
+    <div class="field"><label>Nom d'utilisateur</label><input type="text" id="mtUser" autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="ex: MAFLeeP"></div>
+    <div class="field"><label>Mot de passe</label><input type="password" id="mtPass" placeholder="••••••••"></div>
+  </div>
+  <div class="set-card">
+    <div class="set-title">💻 Perativ</div>
+    <div class="field"><label>Nom d'utilisateur</label><input type="text" id="pvUser" autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="Username"></div>
+    <div class="field"><label>Mot de passe</label><input type="password" id="pvPass" placeholder="••••••••"></div>
+  </div>
+  <div class="set-card">
+    <div class="set-title">🔔 Alertes</div>
+    <div class="field"><label>Seuil montant bas ($)</label><input type="number" id="threshold" value="500" min="0"></div>
+  </div>
+  <button class="save-btn" onclick="saveSettings()">SAUVEGARDER</button>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" id="navDash" onclick="showView('dash')"><span class="nav-icon">📊</span>Dashboard</button>
+  <button class="nav-btn" id="navSet"  onclick="showView('set')"><span class="nav-icon">⚙️</span>Réglages</button>
+</div>
+
+<script>
+const SERVER = 'https://atm-monitor-production.up.railway.app';
+let terminals = [], activeFilter = 'all';
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('atm_cfg') || '{}');
+    if (s.mtUser) document.getElementById('mtUser').value = s.mtUser;
+    if (s.mtPass) document.getElementById('mtPass').value = s.mtPass;
+    if (s.pvUser) document.getElementById('pvUser').value = s.pvUser;
+    if (s.pvPass) document.getElementById('pvPass').value = s.pvPass;
+    if (s.threshold !== undefined) document.getElementById('threshold').value = s.threshold;
+    return s;
+  } catch(e) { return {}; }
+}
+
+function saveSettings() {
+  const s = {
+    mtUser: document.getElementById('mtUser').value.trim(),
+    mtPass: document.getElementById('mtPass').value,
+    pvUser: document.getElementById('pvUser').value.trim(),
+    pvPass: document.getElementById('pvPass').value,
+    threshold: parseInt(document.getElementById('threshold').value) || 500
+  };
+  localStorage.setItem('atm_cfg', JSON.stringify(s));
+  fetch(SERVER + '/api/credentials', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      myterminals: { username: s.mtUser, password: s.mtPass },
+      perativ:     { username: s.pvUser, password: s.pvPass },
+      threshold:   s.threshold
+    })
+  }).catch(console.error);
+  showView('dash');
+  setTimeout(doRefresh, 1500);
+}
+
+function showView(v) {
+  document.getElementById('dashView').style.display = v==='dash' ? '' : 'none';
+  document.getElementById('settingsView').classList.toggle('show', v==='set');
+  document.getElementById('navDash').classList.toggle('active', v==='dash');
+  document.getElementById('navSet').classList.toggle('active',  v==='set');
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+async function doRefresh() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  setLoading();
+  try {
+    await fetch(SERVER + '/api/refresh', { method:'POST' });
+    await new Promise(r => setTimeout(r, 5000));
+    const res  = await fetch(SERVER + '/api/data');
+    const data = await res.json();
+    terminals  = data.terminals || [];
+    const now  = new Date();
+    document.getElementById('syncTime').textContent =
+      `Sync ${now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})}`;
+    renderList();
+    renderStats(data);
+    renderAlerts(data.alerts || []);
+  } catch(e) {
+    document.getElementById('syncTime').textContent = '⚠️ Erreur';
+    document.getElementById('termList').innerHTML = `
+      <div class="state-box"><div class="state-icon">🔴</div>
+      <div class="state-text">Impossible de contacter le serveur.<br>${e.message}</div></div>`;
+  }
+  btn.classList.remove('spinning');
+}
+
+function setLoading() {
+  document.getElementById('termList').innerHTML = `
+    <div class="state-box">
+      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="state-text">Connexion aux guichets...</div>
+    </div>`;
+}
+
+function renderStats(data) {
+  const s = JSON.parse(localStorage.getItem('atm_cfg') || '{}');
+  const th = s.threshold || 500;
+  const t  = data.terminals || [];
+  document.getElementById('sTotal').textContent = t.length || '—';
+  document.getElementById('sLow').textContent   = t.length ? t.filter(x => x.amount>0 && x.amount<th).length : '—';
+  document.getElementById('sEmpty').textContent = t.length ? t.filter(x => x.amount===0).length : '—';
+}
+
+function renderAlerts(alerts) {
+  const b = document.getElementById('alertBanner');
+  if (!alerts.length) { b.classList.remove('show'); return; }
+  b.classList.add('show');
+  document.getElementById('alertItems').innerHTML =
+    alerts.map(a => `<div class="alert-item">${a.msg}</div>`).join('');
+}
+
+function renderList() {
+  const s  = JSON.parse(localStorage.getItem('atm_cfg') || '{}');
+  const th = s.threshold || 500;
+  const q  = document.getElementById('searchBox').value.toLowerCase();
+  let list = terminals;
+  if (activeFilter !== 'all') list = list.filter(t => t.source === activeFilter);
+  if (q) list = list.filter(t => (t.name||'').toLowerCase().includes(q));
+  if (!list.length && !terminals.length) {
+    document.getElementById('termList').innerHTML = `
+      <div class="state-box"><div class="state-icon">⚙️</div>
+      <div class="state-text">Configure tes accès dans <strong>Réglages</strong><br>puis appuie sur ↻</div></div>`;
+    return;
+  }
+  if (!list.length) {
+    document.getElementById('termList').innerHTML = `
+      <div class="state-box"><div class="state-icon">🔍</div><div class="state-text">Aucun résultat</div></div>`;
+    return;
+  }
+  list.sort((a,b) => rank(a,th) - rank(b,th));
+  document.getElementById('termList').innerHTML = list.map(t => {
+    const amt = t.amount;
+    let st, cls, disp;
+    if (amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}
+    else if(amt===0){st='empty';cls='empty';disp='$0';}
+    else if(amt<th){st='low';cls='low';disp=`$${amt.toLocaleString('fr-CA',{maximumFractionDigits:0})}`;}
+    else{st='ok';cls='ok';disp=`$${amt.toLocaleString('fr-CA',{maximumFractionDigits:0})}`;}
+    const src = t.source==='myterminals'?'MyTerminals':'Perativ';
+    return `<div class="card ${st}">
+      <div><div class="card-name">${t.name}</div><div class="card-source">${src}</div></div>
+      <div class="card-amount ${cls}">${disp}</div></div>`;
+  }).join('');
+}
+
+function rank(t,th){
+  if(t.amount===0)return 0;
+  if(t.amount!==null&&t.amount<th)return 1;
+  return 2;
+}
+
+loadSettings();
+const cfg = JSON.parse(localStorage.getItem('atm_cfg')||'{}');
+if(!cfg.mtUser&&!cfg.pvUser) showView('set');
+else doRefresh();
+</script>
+</body>
+</html>
