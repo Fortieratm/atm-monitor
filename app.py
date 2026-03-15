@@ -42,33 +42,48 @@ def scrape_myterminals(user, pwd):
             page.goto("https://secure.myterminals.com/SPS/addins/TerminalManager/Views.aspx", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=15000)
             page.wait_for_timeout(3000)
+
             rows = page.query_selector_all("table tr")
             print(f"MT rows: {len(rows)}")
             header_row = None
             data_rows = []
+
             for i, row in enumerate(rows):
                 tds = row.query_selector_all("td,th")
                 cells = [td.inner_text().strip() for td in tds]
                 if not cells or all(c=="" for c in cells): continue
                 if any("terminal id" in c.lower() for c in cells):
                     header_row = cells
+                    print(f"MT headers: {[h.lower() for h in cells]}")
                 elif header_row and len(cells) >= 5:
                     data_rows.append(cells)
+
             if header_row:
                 headers_lower = [h.lower() for h in header_row]
-                id_idx = next((i for i,h in enumerate(headers_lower) if "terminal id" in h), 0)
-                name_idx = next((i for i,h in enumerate(headers_lower) if "location" in h), 1)
+                id_idx     = next((i for i,h in enumerate(headers_lower) if "terminal id" in h), 0)
+                name_idx   = next((i for i,h in enumerate(headers_lower) if "location" in h), 1)
+                addr_idx   = next((i for i,h in enumerate(headers_lower) if "address" in h), None)
+                city_idx   = next((i for i,h in enumerate(headers_lower) if h.strip() == "city"), None)
+                postal_idx = next((i for i,h in enumerate(headers_lower) if "postal" in h), None)
                 amount_idx = next((i for i,h in enumerate(headers_lower) if "total cassette" in h or ("cassette" in h and "value" in h)), None)
+
                 if amount_idx is None and data_rows:
                     for i, cell in enumerate(data_rows[0]):
                         if "$" in cell:
                             amount_idx = i
                             break
+
+                print(f"MT col indices - id:{id_idx} name:{name_idx} addr:{addr_idx} city:{city_idx} amount:{amount_idx}")
+
                 for cells in data_rows:
                     if len(cells) < 3: continue
                     terminal_id = cells[id_idx] if id_idx < len(cells) else ""
-                    name = cells[name_idx] if name_idx < len(cells) else cells[0]
-                    amount = None
+                    name        = cells[name_idx] if name_idx < len(cells) else cells[0]
+                    address     = cells[addr_idx] if addr_idx is not None and addr_idx < len(cells) else ""
+                    city        = cells[city_idx] if city_idx is not None and city_idx < len(cells) else ""
+                    postal      = cells[postal_idx] if postal_idx is not None and postal_idx < len(cells) else ""
+                    amount      = None
+
                     if amount_idx is not None and amount_idx < len(cells):
                         amount = find_amount(cells[amount_idx])
                     if amount is None:
@@ -78,8 +93,18 @@ def scrape_myterminals(user, pwd):
                                 if amt is not None:
                                     amount = amt
                                     break
+
                     if terminal_id and len(terminal_id) > 3 and " " not in terminal_id:
-                        terminals.append({"source":"myterminals","name":name,"terminal_id":terminal_id,"amount":amount})
+                        terminals.append({
+                            "source": "myterminals",
+                            "name": name,
+                            "terminal_id": terminal_id,
+                            "address": address,
+                            "city": city,
+                            "postal": postal,
+                            "amount": amount
+                        })
+
             print(f"MT found: {len(terminals)}")
         except Exception as e:
             print(f"MT error: {e}")
@@ -128,7 +153,7 @@ def scrape_perativ(user, pwd):
                     headers = [c.lower() for c in cells]
                     continue
                 if not headers or len(cells) < 2: continue
-                name_idx = next((j for j,h in enumerate(headers) if "location" in h or "name" in h), 1)
+                name_idx   = next((j for j,h in enumerate(headers) if "location" in h or "name" in h), 1)
                 amount_idx = next((j for j,h in enumerate(headers) if "txn" in h or "cash" in h or "$" in h), None)
                 name = cells[name_idx] if name_idx < len(cells) else cells[0]
                 amount = None
@@ -142,7 +167,7 @@ def scrape_perativ(user, pwd):
                                 amount = amt
                                 break
                 if name and name not in ["","Location","Terminal"]:
-                    terminals.append({"source":"perativ","name":name,"amount":amount})
+                    terminals.append({"source":"perativ","name":name,"amount":amount,"address":"","city":"","postal":""})
             print(f"PV found: {len(terminals)}")
         except Exception as e:
             print(f"PV error: {e}")
