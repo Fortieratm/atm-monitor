@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ATM Monitor">
-<title>ATM Monitor</title>
+<meta name="apple-mobile-web-app-title" content="ATM CYBER 25 INC.">
+<title>ATM CYBER 25 INC.</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080c10;--card:#0f1520;--card2:#151d2a;--border:#1e2d40;--green:#00ff88;--yellow:#ffd000;--red:#ff2d55;--blue:#0af;--text:#e8f4ff;--muted:#4a6380;--r:14px;}
@@ -14,7 +14,7 @@
 body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100dvh;}
 .header{position:sticky;top:0;z-index:50;background:rgba(8,12,16,0.93);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,44px) 20px 0;}
 .header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px;}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
 .header-right{display:flex;align-items:center;gap:10px;}
 .sync-time{font-size:10px;color:var(--muted);text-align:right;line-height:1.4;}
 .refresh-btn{width:40px;height:40px;border-radius:12px;background:var(--card2);border:1px solid var(--border);color:var(--green);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;}
@@ -78,7 +78,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 <body>
 <div class="header">
   <div class="header-inner">
-    <div class="logo">ATM Monitor</div>
+    <div class="logo">ATM CYBER 25 INC.</div>
     <div class="header-right">
       <div class="sync-time" id="syncTime">Chargement...</div>
       <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()">↻</button>
@@ -136,122 +136,11 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 <script>
 const SERVER='https://atm-monitor-production.up.railway.app';
 let terminals=[],activeFilter='all',autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null;
-
-function loadSettings(){
-  try{
-    const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
-    if(s.mtUser)document.getElementById('mtUser').value=s.mtUser;
-    if(s.mtPass)document.getElementById('mtPass').value=s.mtPass;
-    if(s.pvUser)document.getElementById('pvUser').value=s.pvUser;
-    if(s.pvPass)document.getElementById('pvPass').value=s.pvPass;
-    if(s.threshold!==undefined)document.getElementById('threshold').value=s.threshold;
-    return s;
-  }catch(e){return{};}
-}
-
-function saveSettings(){
-  const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};
-  localStorage.setItem('atm_cfg',JSON.stringify(s));
-  fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);
-  showView('dash');
-  setTimeout(fetchData,2000);
-}
-
-function showView(v){
-  document.getElementById('dashView').style.display=v==='dash'?'':'none';
-  document.getElementById('settingsView').classList.toggle('show',v==='set');
-  document.getElementById('navDash').classList.toggle('active',v==='dash');
-  document.getElementById('navSet').classList.toggle('active',v==='set');
-}
-
-function setFilter(f,btn){
-  activeFilter=f;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  renderList();
-}
-
-async function fetchData(){
-  try{
-    const res=await fetch(SERVER+'/api/data');
-    const data=await res.json();
-    terminals=data.terminals||[];
-    const now=new Date();
-    document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});
-    renderList();renderStats(data);renderAlerts(data.alerts||[]);
-  }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
-}
-
-async function doRefresh(){
-  const btn=document.getElementById('refreshBtn');
-  btn.classList.add('spinning');
-  setLoading();
-  try{
-    await fetch(SERVER+'/api/refresh',{method:'POST'});
-    await new Promise(r=>setTimeout(r,8000));
-    await fetchData();
-  }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
-  btn.classList.remove('spinning');
-  scheduleNextRefresh();
-}
-
-function scheduleNextRefresh(){
-  if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
-  if(countdownTimer)clearInterval(countdownTimer);
-  const INTERVAL=5*60*1000;
-  nextRefreshTime=Date.now()+INTERVAL;
-  autoRefreshTimer=setTimeout(()=>{doRefresh();},INTERVAL);
-  countdownTimer=setInterval(()=>{
-    const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));
-    const min=Math.floor(remaining/60);
-    const sec=remaining%60;
-    document.getElementById('nextRefresh').textContent='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');
-    if(remaining===0)clearInterval(countdownTimer);
-  },1000);
-}
-
-function setLoading(){
-  document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="state-text">Connexion aux guichets...</div></div>';
-}
-
-function renderStats(data){
-  const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
-  const th=s.threshold||500;
-  const t=data.terminals||[];
-  document.getElementById('sTotal').textContent=t.length||'—';
-  document.getElementById('sLow').textContent=t.length?t.filter(x=>x.amount>0&&x.amount<th).length:'—';
-  document.getElementById('sEmpty').textContent=t.length?t.filter(x=>x.amount===0).length:'—';
-}
-
-function renderAlerts(alerts){
-  const b=document.getElementById('alertBanner');
-  if(!alerts.length){b.classList.remove('show');return;}
-  b.classList.add('show');
-  document.getElementById('alertItems').innerHTML=alerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');
-}
-
-function renderList(){
-  const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
-  const th=s.threshold||500;
-  const q=document.getElementById('searchBox').value.toLowerCase();
-  let list=terminals;
-  if(activeFilter!=='all')list=list.filter(t=>t.source===activeFilter);
-  if(q)list=list.filter(t=>(t.name||'').toLowerCase().includes(q));
-  if(!list.length&&!terminals.length){
-    document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">⚙️</div><div class="state-text">Configure tes accès dans <strong>Réglages</strong><br>puis appuie sur ↻</div></div>';
-    return;
-  }
-  if(!list.length){
-    document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">🔍</div><div class="state-text">Aucun résultat</div></div>';
-    return;
-  }
-  list.sort((a,b)=>rank(a,th)-rank(b,th));
-  document.getElementById('termList').innerHTML=list.map(t=>{
-    const amt=t.amount;
-    let st,cls,disp;
-    if(amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}
-    else if(amt===0){st='empty';cls='empty';disp='$0';}
-    else if(amt<th){st='low';cls='low';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}
-    else{st='ok';cls='ok';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}
-    const src=t.source==='myterminals'?'MyTerminals':'Perativ';
-    return '<div class="card '+st+'"><div><div class="card-name">'+t.name+'</div><div class="card-source">'+src+'</div></div><d
+function loadSettings(){try{const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');if(s.mtUser)document.getElementById('mtUser').value=s.mtUser;if(s.mtPass)document.getElementById('mtPass').value=s.mtPass;if(s.pvUser)document.getElementById('pvUser').value=s.pvUser;if(s.pvPass)document.getElementById('pvPass').value=s.pvPass;if(s.threshold!==undefined)document.getElementById('threshold').value=s.threshold;return s;}catch(e){return{};}}
+function saveSettings(){const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};localStorage.setItem('atm_cfg',JSON.stringify(s));fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);showView('dash');setTimeout(fetchData,2000);}
+function showView(v){document.getElementById('dashView').style.display=v==='dash'?'':'none';document.getElementById('settingsView').classList.toggle('show',v==='set');document.getElementById('navDash').classList.toggle('active',v==='dash');document.getElementById('navSet').classList.toggle('active',v==='set');}
+function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderList();}
+async function fetchData(){try{const res=await fetch(SERVER+'/api/data');const data=await res.json();terminals=data.terminals||[];const now=new Date();document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});renderList();renderStats(data);renderAlerts(data.alerts||[]);}catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}}
+async function doRefresh(){const btn=document.getElementById('refreshBtn');btn.classList.add('spinning');setLoading();try{await fetch(SERVER+'/api/refresh',{method:'POST'});await new Promise(r=>setTimeout(r,8000));await fetchData();}catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}btn.classList.remove('spinning');scheduleNextRefresh();}
+function scheduleNextRefresh(){if(autoRefreshTimer)clearTimeout(autoRefreshTimer);if(countdownTimer)clearInterval(countdownTimer);const INTERVAL=5*60*1000;nextRefreshTime=Date.now()+INTERVAL;autoRefreshTimer=setTimeout(()=>{doRefresh();},INTERVAL);countdownTimer=setInterval(()=>{const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));const min=Math.floor(remaining/60);const sec=remaining%60;document.getElementById('nextRefresh').textContent='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');if(remaining===0)clearInterval(countdownTimer);},1000);}
+function setLoading(){document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div
