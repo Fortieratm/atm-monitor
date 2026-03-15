@@ -118,12 +118,15 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .modal-save{flex:1;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--green),var(--blue));color:#000;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;}
 .modal-cancel{flex:1;padding:13px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;}
 .modal-reset{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;cursor:pointer;text-decoration:underline;}
-.export-list{background:var(--card2);border-radius:10px;padding:16px;margin-bottom:12px;font-size:12px;line-height:2;white-space:pre-wrap;word-break:break-all;max-height:280px;overflow-y:auto;}
-.maps-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.export-list{background:var(--card2);border-radius:10px;padding:16px;margin-bottom:12px;font-size:12px;line-height:2;white-space:pre-wrap;word-break:break-all;max-height:240px;overflow-y:auto;}
+.maps-btns{display:flex;gap:8px;margin-bottom:8px;}
+.maps-btn{flex:1;padding:13px;border-radius:12px;border:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
 .maps-btn:active{opacity:0.85;}
-.maps-note{font-size:10px;color:var(--muted);text-align:center;margin-bottom:12px;padding:8px;background:rgba(66,133,244,0.08);border-radius:8px;border:1px solid rgba(66,133,244,0.2);}
+.maps-btn.apple{background:linear-gradient(135deg,#555,#222);border:1px solid #444;}
+.maps-btn.google{background:linear-gradient(135deg,#4285f4,#34a853);}
+.maps-note{font-size:10px;color:var(--muted);text-align:center;margin-bottom:12px;}
 .export-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.export-action-btn{flex:1;padding:12px;border-radius:10px;border:none;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;min-width:100px;}
+.export-action-btn{flex:1;padding:12px;border-radius:10px;border:none;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;min-width:80px;}
 .btn-copy{background:var(--blue);color:#000;}
 .btn-sms{background:var(--green);color:#000;}
 .btn-email{background:var(--yellow);color:#000;}
@@ -239,8 +242,11 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
   <div class="modal">
     <div class="modal-title">📋 Liste de remplissage</div>
     <div class="modal-name" id="exportSubtitle"></div>
-    <button class="maps-btn" onclick="openGoogleMaps()">🗺️ Parcours optimisé → Sutton</button>
-    <div class="maps-note">📍 Départ & retour: Sutton · Google Maps optimise l'ordre automatiquement</div>
+    <div class="maps-btns">
+      <button class="maps-btn apple" onclick="openAppleMaps()">🍎 Apple Maps</button>
+      <button class="maps-btn google" onclick="openGoogleMaps()">🗺️ Google Maps</button>
+    </div>
+    <div class="maps-note">📍 Départ & retour Sutton · Parcours optimisé aller-retour</div>
     <div class="export-list" id="exportText"></div>
     <div class="export-actions">
       <button class="export-action-btn btn-copy" onclick="copyList()">📋 Copier</button>
@@ -255,11 +261,16 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 const SERVER='https://atm-monitor-production.up.railway.app';
 const APP_PASSWORD='Cyber25911!';
 const ORIGIN_ADDRESS='161 rue Principale Sud, Sutton, QC, Canada';
+const ORIGIN_ADDRESS_APPLE='161 rue Principale Sud, Sutton, QC';
 const BASE_LAT=45.1253,BASE_LNG=-72.6089;
 let terminals=[],activeFilter='all';
 let autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null;
-let currentModalId=null,selectedIds=new Set(),mapsUrl='';
+let currentModalId=null,selectedIds=new Set();
+let googleMapsUrl='',appleMapsUrl='';
 let fetchRetryTimer=null;
+
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||
+  (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 
 const CITY_COORDS={
   'sherbrooke':{lat:45.4042,lng:-71.8929},'sutton':{lat:45.1253,lng:-72.6089},
@@ -286,22 +297,43 @@ function distanceKm(la1,lo1,la2,lo2){
 }
 function getDistance(t){const c=getCoords(t);if(!c)return 9999;return distanceKm(BASE_LAT,BASE_LNG,c.lat,c.lng);}
 
-function buildMapsUrl(selected){
+function getAddr(t){
+  if(t.address&&t.city)return t.address+', '+t.city+', QC, Canada';
+  if(t.city)return t.name+', '+t.city+', QC, Canada';
+  return t.name+', QC, Canada';
+}
+
+// Google Maps URL — optimize:true + retour Sutton
+function buildGoogleMapsUrl(selected){
   if(!selected.length)return 'https://www.google.com/maps/';
   const origin=encodeURIComponent(ORIGIN_ADDRESS);
   const destination=encodeURIComponent(ORIGIN_ADDRESS);
-  const stops=selected.map(t=>{
-    if(t.address&&t.city)return encodeURIComponent(t.address+', '+t.city+', QC, Canada');
-    if(t.city)return encodeURIComponent(t.name+', '+t.city+', QC, Canada');
-    return encodeURIComponent(t.name+', QC, Canada');
-  });
+  const stops=selected.map(t=>encodeURIComponent(getAddr(t)));
   let url='https://www.google.com/maps/dir/?api=1';
   url+='&origin='+origin+'&destination='+destination;
   if(stops.length>0)url+='&waypoints=optimize:true|'+stops.join('|');
   url+='&travelmode=driving';
   return url;
 }
-function openGoogleMaps(){if(mapsUrl)window.open(mapsUrl,'_blank');}
+
+// Apple Maps URL — format maps.apple.com avec waypoints
+function buildAppleMapsUrl(selected){
+  if(!selected.length)return 'https://maps.apple.com/';
+  // Apple Maps supporte jusqu'à 1 destination dans l'URL de base
+  // On utilise le format daddr pour multi-stops
+  const origin=encodeURIComponent(ORIGIN_ADDRESS_APPLE);
+  const stops=selected.map(t=>{
+    if(t.address&&t.city)return encodeURIComponent(t.address+', '+t.city+', QC');
+    if(t.city)return encodeURIComponent(t.name+', '+t.city+', QC');
+    return encodeURIComponent(t.name+', QC');
+  });
+  // Apple Maps: saddr=départ & daddr=arrivée (multi-stop via +to:)
+  const allStops=[...stops,origin].join('+to:');
+  return 'https://maps.apple.com/?saddr='+origin+'&daddr='+allStops+'&dirflg=d';
+}
+
+function openGoogleMaps(){if(googleMapsUrl)window.open(googleMapsUrl,'_blank');}
+function openAppleMaps(){if(appleMapsUrl)window.open(appleMapsUrl,'_blank');}
 
 // LOGIN
 function checkAuth(){
@@ -409,21 +441,36 @@ function clearSelection(){selectedIds.clear();renderList();updateFillBar();}
 
 // EXPORT
 function showExport(){
-  const selected=terminals.filter(t=>selectedIds.has(t.terminal_id||t.name)).map(t=>({...t,distance:getDistance(t)})).sort((a,b)=>a.distance-b.distance);
-  mapsUrl=buildMapsUrl(selected);
+  const selected=terminals
+    .filter(t=>selectedIds.has(t.terminal_id||t.name))
+    .map(t=>({...t,distance:getDistance(t)}))
+    .sort((a,b)=>a.distance-b.distance);
+
+  googleMapsUrl=buildGoogleMapsUrl(selected);
+  appleMapsUrl=buildAppleMapsUrl(selected);
+
   const now=new Date();
-  let text='🏧 ATM CYBER 25 INC.\nListe de remplissage\n'+now.toLocaleDateString('fr-CA')+' '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})+'\n📍 Départ & retour: Sutton\n🗺️ Ordre optimisé par Google Maps\n━━━━━━━━━━━━━━━━━━━━\n\n';
+  let text='🏧 ATM CYBER 25 INC.\nListe de remplissage\n';
+  text+=now.toLocaleDateString('fr-CA')+' '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})+'\n';
+  text+='📍 Départ & retour: Sutton\n🗺️ Parcours optimisé\n━━━━━━━━━━━━━━━━━━━━\n\n';
   let totalOrder=0;
   selected.forEach((t,i)=>{
-    const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount||0;const toOrder=Math.max(0,th-amt);totalOrder+=toOrder;
+    const id=t.terminal_id||t.name;
+    const th=getThresholdForTerminal(id);
+    const amt=t.amount||0;
+    const toOrder=Math.max(0,th-amt);
+    totalOrder+=toOrder;
     const dist=t.distance<9999?' (~'+t.distance.toFixed(0)+'km)':'';
     text+=(i+1)+'. '+t.name+dist+'\n';
     if(t.address&&t.city)text+='   📍 '+t.address+', '+t.city+'\n';
     else if(t.city)text+='   📍 '+t.city+'\n';
-    text+='   💵 En caisse: $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n   📦 À mettre: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n\n';
+    text+='   💵 En caisse: $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';
+    text+='   📦 À mettre: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n\n';
   });
-  text+='━━━━━━━━━━━━━━━━━━━━\n💰 TOTAL: $'+totalOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n'+selected.length+' guichet'+(selected.length>1?'s':'')+' à remplir';
-  document.getElementById('exportSubtitle').textContent=selected.length+' guichets — parcours aller-retour optimisé';
+  text+='━━━━━━━━━━━━━━━━━━━━\n💰 TOTAL: $'+totalOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';
+  text+=selected.length+' guichet'+(selected.length>1?'s':'')+' à remplir';
+
+  document.getElementById('exportSubtitle').textContent=selected.length+' guichets — aller-retour optimisé depuis Sutton';
   document.getElementById('exportText').textContent=text;
   document.getElementById('exportModal').classList.add('show');
 }
@@ -459,7 +506,7 @@ function mobileView(v){
   if(sw)sw.style.display=v==='dash'?'':'none';
 }
 
-// DATA — polling intelligent avec retry automatique
+// DATA
 function updateUI(data){
   terminals=data.terminals||[];
   const now=new Date();
@@ -475,7 +522,6 @@ async function fetchData(){
     if(data.terminals&&data.terminals.length>0){
       updateUI(data);
     }else{
-      // Pas encore de données — réessaie dans 3s
       const st=document.getElementById('loadingStatus');
       if(st)st.textContent='Scraping en cours...';
       fetchRetryTimer=setTimeout(fetchData,3000);
@@ -489,34 +535,25 @@ async function fetchData(){
 async function doRefresh(){
   const btn=document.getElementById('refreshBtn');
   btn.classList.add('spinning');
-  // Affiche le loader avec statut
   document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div style="font-size:13px">Scraping en cours...</div><div class="loading-status" id="loadingStatus">Connexion aux plateformes...</div></div>';
   try{
     await fetch(SERVER+'/api/refresh',{method:'POST'});
     const startTime=Date.now();
     let attempts=0;
-    // Polling toutes les 3s — s'arrête dès que les données sont fraîches
     while(attempts<20){
       await new Promise(r=>setTimeout(r,3000));
       attempts++;
       const elapsed=Math.round((Date.now()-startTime)/1000);
       const st=document.getElementById('loadingStatus');
-      if(st)st.textContent=elapsed+'s écoulées...';
+      if(st)st.textContent=elapsed+'s...';
       try{
         const res=await fetch(SERVER+'/api/data');
         const data=await res.json();
         if(data.terminals&&data.terminals.length>0&&data.last_updated){
           const updated=new Date(data.last_updated).getTime();
-          if(updated>startTime-2000){
-            updateUI(data);
-            break;
-          }
+          if(updated>startTime-2000){updateUI(data);break;}
         }
-        // Fallback: affiche les données existantes après 30s
-        if(attempts>=10&&data.terminals&&data.terminals.length>0){
-          updateUI(data);
-          break;
-        }
+        if(attempts>=10&&data.terminals&&data.terminals.length>0){updateUI(data);break;}
       }catch(e){}
     }
   }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
@@ -525,10 +562,8 @@ async function doRefresh(){
 }
 
 function scheduleNextRefresh(){
-  if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
-  if(countdownTimer)clearInterval(countdownTimer);
-  const INTERVAL=5*60*1000;
-  nextRefreshTime=Date.now()+INTERVAL;
+  if(autoRefreshTimer)clearTimeout(autoRefreshTimer);if(countdownTimer)clearInterval(countdownTimer);
+  const INTERVAL=5*60*1000;nextRefreshTime=Date.now()+INTERVAL;
   autoRefreshTimer=setTimeout(()=>doRefresh(),INTERVAL);
   countdownTimer=setInterval(()=>{
     const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));
@@ -570,7 +605,7 @@ function renderList(){
   if(activeFilter!=='all')list=list.filter(t=>t.source===activeFilter);
   if(q)list=list.filter(t=>(t.name||'').toLowerCase().includes(q)||(t.city||'').toLowerCase().includes(q));
   if(!list.length){
-    if(terminals.length===0)return; // Garde le loader
+    if(terminals.length===0)return;
     document.getElementById('termList').innerHTML='<div class="state-box" style="padding:24px"><div style="font-size:13px;color:var(--muted)">Aucun résultat</div></div>';
     return;
   }
