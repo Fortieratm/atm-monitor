@@ -1,11 +1,10 @@
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
-import requests
-from bs4 import BeautifulSoup
 import threading
 import os
 import re
 from datetime import datetime
+from playwright.sync_api import sync_playwright
 
 app = Flask(__name__)
 CORS(app)
@@ -19,148 +18,106 @@ def get_credentials():
         "threshold":   float(os.environ.get("THRESHOLD","500"))
     }
 
-def find_amount(cells):
-    for cell in cells:
-        cleaned = re.sub(r'[$,\s]', '', str(cell))
-        try:
-            v = float(cleaned)
-            if 0 <= v < 10_000_000: return v
-        except: continue
+def find_amount(text):
+    cleaned = re.sub(r'[$,\s]', '', str(text))
+    try:
+        v = float(cleaned)
+        if 0 <= v < 10_000_000: return v
+    except: pass
     return None
 
-def parse_html_tables(soup, source):
-    results = []
-    for table in soup.find_all("table"):
-        rows = table.find_all("tr")
+def scrape_tables(page, source):
+    terminals = []
+    tables = page.query_selector_all("table")
+    print(f"{source} tables: {len(tables)}")
+    for table in tables:
+        rows = table.query_selector_all("tr")
         if len(rows) < 2: continue
-        headers = [c.get_text(strip=True).lower() for c in rows[0].find_all(["th","td"])]
+        headers = [th.inner_text().strip().lower() for th in rows[0].query_selector_all("th,td")]
         print(f"{source} headers: {headers}")
         for row in rows[1:]:
-            cells = [c.get_text(strip=True) for c in row.find_all("td")]
+            cells = [td.inner_text().strip() for td in row.query_selector_all("td")]
             if not cells or all(c=="" for c in cells): continue
-            obj = {"source": source, "name": cells[0], "amount": find_amount(cells)}
-            for i, h in enumerate(headers):
+            obj = {"source":source,"name":cells[0],"amount":None}
+            for i,h in enumerate(headers):
                 if i < len(cells): obj[h] = cells[i]
-            results.append(obj)
-    return results
-
-def scrape_myterminals(user, pwd):
-    s = requests.Session()
-    s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-    url = "https://secure.myterminals.com/SPS/login/login.aspx?ReturnUrl=%2FSPS%2Fdefault.aspx"
-    r = s.get(url, timeout=20)
-    soup = BeautifulSoup(r.text, "html.parser")
-    payload = {}
-    for inp in soup.find_all("input"):
-        if inp.get("name"): payload[inp["name"]] = inp.get("value","")
-    uf = soup.find("input", {"type":"text"})
-    pf = soup.find("input", {"type":"password"})
-    bf = soup.find("input", {"type":"submit"})
-    if uf: payload[uf["name"]] = user
-    if pf: payload[pf["name"]] = pwd
-    if bf: payload[bf["name"]] = bf.get("value","Login")
-    r2 = s.post(url, data=payload, timeout=20, allow_redirects=True)
-    print(f"MT: {r2.status_code} -> {r2.url}")
-    soup2 = BeautifulSoup(r2.text, "html.parser")
-    t = parse_html_tables(soup2, "myterminals")
-    # Try other pages if empty
-    if not t:
-        for path in ["/SPS/default.aspx", "/SPS/Terminal/List", "/SPS/ATM"]:
-            try:
-                r3 = s.get(f"https://secure.myterminals.com{path}", timeout=10)
-                soup3 = BeautifulSoup(r3.text, "html.parser")
-                t = parse_html_tables(soup3, "myterminals")
-                print(f"MT {path}: {len(t)} terminals")
-                if t: break
-            except: pass
-    print(f"MT total: {len(t)}")
-    return t
-
-def scrape_perativ(user, pwd):
-    s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "fr-CA,fr;q=0.9,en;q=0.8",
-    })
-
-    login_url = "https://webapps.perativ.com/Account/Login"
-    r = s.get(login_url, timeout=20)
-    print(f"PV GET: {r.status_code}")
-    soup = BeautifulSoup(r.text, "html.parser")
-
-    payload = {"UserName": user, "Password": pwd, "RememberMe": "false"}
-    token = soup.find("input", {"name": "__RequestVerificationToken"})
-    if token: payload["__RequestVerificationToken"] = token["value"]
-
-    r2 = s.post(login_url, data=payload,
-                headers={"Content-Type":"application/x-www-form-urlencoded","Referer":login_url,"Origin":"https://webapps.perativ.com"},
-                timeout=20, allow_redirects=True)
-    print(f"PV POST: {r2.status_code} -> {r2.url}")
-
-    # Print page title to debug
-    soup2 = BeautifulSoup(r2.text, "html.parser")
-    title = soup2.find("title")
-    print(f"PV page title: {title.text if title else 'none'}")
-
-    terminals = []
-
-    # Try JSON API endpoints first
-    api_endpoints = [
-        "/api/terminals", "/api/Terminal", "/api/terminal/list",
-        "/api/dashboard", "/api/cashposition", "/api/atm",
-        "/Terminal/GetAll", "/Dashboard/Terminals",
-    ]
-    for ep in api_endpoints:
-        try:
-            rj = s.get(f"https://webapps.perativ.com{ep}",
-                      headers={"Accept":"application/json","X-Requested-With":"XMLHttpRequest"},
-                      timeout=10)
-            print(f"PV API {ep}: {rj.status_code} | {rj.text[:100]}")
-            if rj.status_code == 200 and (rj.text.strip().startswith("[") or rj.text.strip().startswith("{")):
-                data = rj.json()
-                parsed = parse_json_terminals(data)
-                if parsed:
-                    terminals.extend(parsed)
-                    print(f"PV got {len(parsed)} from {ep}")
-                    break
-        except Exception as e:
-            print(f"PV {ep}: {e}")
-
-    # Try HTML pages
-    if not terminals:
-        for pg in ["https://webapps.perativ.com/", "https://webapps.perativ.com/Terminal",
-                   "https://webapps.perativ.com/Terminals", "https://webapps.perativ.com/Dashboard"]:
-            try:
-                rp = s.get(pg, timeout=15)
-                print(f"PV page {pg}: {rp.status_code} len:{len(rp.text)}")
-                sp = BeautifulSoup(rp.text, "html.parser")
-                t = parse_html_tables(sp, "perativ")
-                if t:
-                    terminals.extend(t)
-                    print(f"PV got {len(t)} from {pg}")
-                    break
-                # Log page content snippet for debugging
-                print(f"PV page snippet: {rp.text[500:800]}")
-            except Exception as e:
-                print(f"PV page {pg}: {e}")
-
-    print(f"PV total: {len(terminals)}")
+            for key in ["available","cash available","balance","amount","cash position","cassette"]:
+                if key in obj:
+                    amt = find_amount(obj[key])
+                    if amt is not None:
+                        obj["amount"] = amt
+                        break
+            terminals.append(obj)
     return terminals
 
-def parse_json_terminals(data):
-    results = []
-    items = data if isinstance(data, list) else data.get("terminals") or data.get("data") or data.get("items") or []
-    for item in items:
-        if not isinstance(item, dict): continue
-        name = item.get("name") or item.get("location") or item.get("terminalId") or item.get("id","?")
-        amount = None
-        for k in ["available","cashAvailable","balance","amount","cashPosition","Available","CashAvailable"]:
-            if k in item:
-                try: amount = float(str(item[k]).replace("$","").replace(",","")); break
-                except: pass
-        results.append({"source":"perativ","name":str(name),"amount":amount})
-    return results
+def scrape_myterminals(user, pwd):
+    terminals = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"])
+        page = browser.new_page()
+        try:
+            page.goto("https://secure.myterminals.com/SPS/login/login.aspx?ReturnUrl=%2FSPS%2Fdefault.aspx", timeout=30000)
+            page.fill("input[type=text]", user)
+            page.fill("input[type=password]", pwd)
+            page.click("input[type=submit]")
+            page.wait_for_load_state("networkidle", timeout=15000)
+            print(f"MT after login: {page.url}")
+            terminals = scrape_tables(page, "myterminals")
+            print(f"MT found: {len(terminals)}")
+        except Exception as e:
+            print(f"MT error: {e}")
+        finally:
+            browser.close()
+    return terminals
+
+def scrape_perativ(user, pwd):
+    terminals = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"])
+        page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36")
+        try:
+            page.goto("https://webapps.perativ.com/Account/Login", timeout=30000)
+            page.wait_for_load_state("networkidle", timeout=10000)
+            print(f"PV login page: {page.url}")
+            page.wait_for_timeout(2000)
+
+            # Fill login
+            page.fill("input[name='UserName']", user)
+            page.fill("input[name='Password']", pwd)
+            
+            # Click login button
+            for selector in ["button[type='submit']","input[type='submit']","button:has-text('Login')","button:has-text('Sign in')"]:
+                try:
+                    page.click(selector, timeout=3000)
+                    break
+                except: continue
+
+            page.wait_for_load_state("networkidle", timeout=15000)
+            page.wait_for_timeout(3000)
+            print(f"PV after login: {page.url}")
+            print(f"PV page title: {page.title()}")
+
+            terminals = scrape_tables(page, "perativ")
+
+            # Try navigation if no tables
+            if not terminals:
+                for nav in ["https://webapps.perativ.com/","https://webapps.perativ.com/Terminal","https://webapps.perativ.com/Dashboard"]:
+                    try:
+                        page.goto(nav, timeout=10000)
+                        page.wait_for_timeout(2000)
+                        t = scrape_tables(page, "perativ")
+                        if t:
+                            terminals.extend(t)
+                            break
+                    except Exception as e:
+                        print(f"PV nav {nav}: {e}")
+
+            print(f"PV found: {len(terminals)}")
+        except Exception as e:
+            print(f"PV error: {e}")
+        finally:
+            browser.close()
+    return terminals
 
 def refresh():
     global atm_data
