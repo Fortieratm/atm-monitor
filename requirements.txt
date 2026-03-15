@@ -3,4 +3,5 @@ flask-cors==4.0.0
 requests==2.31.0
 beautifulsoup4==4.12.2
 gunicorn==21.2.0
+lxml>=5.0.0
 playwright==1.41.0
