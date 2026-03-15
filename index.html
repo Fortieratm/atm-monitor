@@ -283,9 +283,7 @@ function rank(t,th){
 }
 
 loadSettings();
-const cfg = JSON.parse(localStorage.getItem('atm_cfg')||'{}');
-if(!cfg.mtUser&&!cfg.pvUser) showView('set');
-else doRefresh();
+doRefresh();
 </script>
 </body>
 </html>
