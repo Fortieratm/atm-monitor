@@ -14,7 +14,7 @@
 body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;}
 .header{position:sticky;top:0;z-index:50;background:rgba(8,12,16,0.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,12px) 24px 0;}
 .header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px;}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
 .header-right{display:flex;align-items:center;gap:12px;}
 .sync-time{font-size:11px;color:var(--muted);text-align:right;line-height:1.4;}
 .refresh-btn{width:40px;height:40px;border-radius:12px;background:var(--card2);border:1px solid var(--border);color:var(--green);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
@@ -26,17 +26,23 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .tab{flex:1;padding:8px 4px;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.5px;}
 .tab:hover{border-color:var(--muted);}
 .tab.active{background:var(--card2);border-color:var(--green);color:var(--green);}
-.main-layout{display:flex;gap:24px;padding:20px 24px;padding-bottom:40px;max-width:1400px;margin:0 auto;}
+.main-layout{display:flex;gap:24px;padding:20px 24px;padding-bottom:40px;max-width:1600px;margin:0 auto;}
 @media(max-width:768px){.main-layout{flex-direction:column;padding:12px 16px;padding-bottom:calc(80px + env(safe-area-inset-bottom));}}
 .left-panel{flex:0 0 300px;}
-@media(max-width:768px){.left-panel{flex:none;}}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 10px;text-align:center;position:relative;overflow:hidden;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 10px;text-align:center;position:relative;overflow:hidden;}
 .stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
 .stat.s-total::after{background:var(--blue);}.stat.s-low::after{background:var(--yellow);}.stat.s-empty::after{background:var(--red);}
-.stat-num{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;}
-.c-blue{color:var(--blue);}.c-yellow{color:var(--yellow);}.c-red{color:var(--red);}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;}
+.c-blue{color:var(--blue);}.c-yellow{color:var(--yellow);}.c-red{color:var(--red);}.c-orange{color:#ff8800;}
 .stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+
+/* TOTAL TO ORDER BANNER */
+.order-banner{background:linear-gradient(135deg,rgba(255,136,0,0.15),rgba(255,45,85,0.1));border:1px solid rgba(255,136,0,0.4);border-radius:var(--r);padding:16px 18px;margin-bottom:16px;}
+.order-banner-title{font-size:10px;color:#ff8800;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.order-banner-amount{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#ff8800;line-height:1;}
+.order-banner-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+
 .alert-banner{border-radius:var(--r);background:rgba(255,45,85,0.08);border:1px solid rgba(255,45,85,0.25);overflow:hidden;display:none;margin-bottom:16px;}
 .alert-banner.show{display:block;}
 .alert-header{padding:10px 14px;font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(255,45,85,0.15);}
@@ -56,19 +62,30 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .search-input::placeholder{color:var(--muted);}
 .next-refresh{font-size:10px;color:var(--muted);text-align:center;padding:4px 0 8px;}
 .right-panel{flex:1;min-width:0;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;transition:all 0.15s;}
+
+/* TERMINAL CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;position:relative;overflow:hidden;transition:all 0.15s;}
 .card:hover{border-color:var(--muted);}
 .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
 .card.ok::before{background:var(--green);}.card.low::before{background:var(--yellow);}.card.empty::before{background:var(--red);}
 .card.low{border-color:rgba(255,208,0,0.2);}.card.empty{border-color:rgba(255,45,85,0.25);background:rgba(255,45,85,0.04);}
-.card-info{flex:1;min-width:0;}
+.card-info{min-width:0;}
 .card-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .card-source{font-size:10px;color:var(--muted);margin-top:2px;}
-.card-threshold{font-size:10px;color:var(--muted);margin-top:2px;}
-.card-amount{font-family:'Bebas Neue',sans-serif;font-size:24px;flex-shrink:0;letter-spacing:1px;}
+.card-meta{font-size:10px;color:var(--muted);margin-top:3px;}
+.card-meta span{margin-right:12px;}
+.card-meta .to-order{color:#ff8800;}
+
+/* AMOUNTS SECTION */
+.card-amounts{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.card-amount{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;line-height:1;}
 .card-amount.ok{color:var(--green);}.card-amount.low{color:var(--yellow);}.card-amount.empty{color:var(--red);}.card-amount.na{color:var(--muted);font-size:14px;font-family:'Space Mono',monospace;}
+.card-order{font-size:11px;color:#ff8800;text-align:right;}
+
 .edit-btn{background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:5px 10px;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;transition:all 0.15s;flex-shrink:0;}
 .edit-btn:hover{border-color:var(--green);color:var(--green);}
+
+/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.show{display:flex;}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:380px;}
@@ -80,7 +97,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .modal-save{flex:1;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--green),var(--blue));color:#000;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;}
 .modal-cancel{flex:1;padding:13px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;}
 .modal-reset{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;cursor:pointer;text-decoration:underline;}
-.modal-reset:hover{color:var(--text);}
 .state-box{text-align:center;padding:48px 20px;color:var(--muted);}
 .state-icon{font-size:52px;margin-bottom:14px;}
 .state-text{font-size:13px;line-height:1.7;}
@@ -118,6 +134,14 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
       <div class="stat s-low"><div class="stat-num c-yellow" id="sLow">—</div><div class="stat-lbl">Bas</div></div>
       <div class="stat s-empty"><div class="stat-num c-red" id="sEmpty">—</div><div class="stat-lbl">Vides</div></div>
     </div>
+
+    <!-- TOTAL TO ORDER -->
+    <div class="order-banner" id="orderBanner" style="display:none">
+      <div class="order-banner-title">💰 Total à commander</div>
+      <div class="order-banner-amount" id="orderTotal">$0</div>
+      <div class="order-banner-sub" id="orderCount"></div>
+    </div>
+
     <div class="alert-banner" id="alertBanner">
       <div class="alert-header">⚠️ Alertes actives</div>
       <div id="alertItems"></div>
@@ -134,7 +158,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
     </div>
     <div class="panel" id="alertPanel">
       <div class="panel-title">🔔 Seuil Global ($)</div>
-      <div class="field"><label>Montant bas par défaut</label><input type="number" id="threshold" value="500" min="0"></div>
+      <div class="field"><label>Montant cible par défaut</label><input type="number" id="threshold" value="500" min="0"></div>
       <button class="save-btn" onclick="saveSettings()">SAUVEGARDER</button>
     </div>
     <div class="next-refresh" id="nextRefresh"></div>
@@ -169,27 +193,198 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 </div>
 <script>
 const SERVER='https://atm-monitor-production.up.railway.app';
-let terminals=[],activeFilter='all',autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null,currentModalId=null,atm_data_cache=null;
+let terminals=[],activeFilter='all',autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null,currentModalId=null;
+
 function getThresholds(){try{return JSON.parse(localStorage.getItem('atm_thresholds')||'{}');}catch(e){return{};}}
 function setThresholdForTerminal(id,value){const t=getThresholds();if(value===null)delete t[id];else t[id]=value;localStorage.setItem('atm_thresholds',JSON.stringify(t));}
 function getThresholdForTerminal(id){const t=getThresholds();const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');return t[id]!==undefined?t[id]:(s.threshold||500);}
-function openModal(id,name){currentModalId=id;const t=getThresholds();document.getElementById('modalName').textContent=name;document.getElementById('modalInput').value=t[id]!==undefined?t[id]:'';document.getElementById('modalInput').placeholder='Seuil global: $'+(JSON.parse(localStorage.getItem('atm_cfg')||'{}').threshold||500);document.getElementById('modalOverlay').classList.add('show');setTimeout(()=>document.getElementById('modalInput').focus(),100);}
+
+function openModal(id,name){
+  currentModalId=id;
+  const t=getThresholds();
+  const globalTh=JSON.parse(localStorage.getItem('atm_cfg')||'{}').threshold||500;
+  document.getElementById('modalName').textContent=name;
+  document.getElementById('modalInput').value=t[id]!==undefined?t[id]:'';
+  document.getElementById('modalInput').placeholder='Seuil global: $'+globalTh;
+  document.getElementById('modalOverlay').classList.add('show');
+  setTimeout(()=>document.getElementById('modalInput').focus(),100);
+}
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');currentModalId=null;}
-function saveThreshold(){const val=parseInt(document.getElementById('modalInput').value);if(!isNaN(val)&&val>=0){setThresholdForTerminal(currentModalId,val);closeModal();renderList();renderAlerts([]);}}
-function resetThreshold(){setThresholdForTerminal(currentModalId,null);closeModal();renderList();}
+function saveThreshold(){const val=parseInt(document.getElementById('modalInput').value);if(!isNaN(val)&&val>=0){setThresholdForTerminal(currentModalId,val);closeModal();renderList();renderOrderBanner();}}
+function resetThreshold(){setThresholdForTerminal(currentModalId,null);closeModal();renderList();renderOrderBanner();}
 document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
-function loadSettings(){try{const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');if(s.mtUser)document.getElementById('mtUser').value=s.mtUser;if(s.mtPass)document.getElementById('mtPass').value=s.mtPass;if(s.pvUser)document.getElementById('pvUser').value=s.pvUser;if(s.pvPass)document.getElementById('pvPass').value=s.pvPass;if(s.threshold!==undefined)document.getElementById('threshold').value=s.threshold;return s;}catch(e){return{};}}
-function saveSettings(){const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};localStorage.setItem('atm_cfg',JSON.stringify(s));fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);mobileView('dash');setTimeout(fetchData,2000);}
+
+function loadSettings(){
+  try{
+    const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
+    if(s.mtUser)document.getElementById('mtUser').value=s.mtUser;
+    if(s.mtPass)document.getElementById('mtPass').value=s.mtPass;
+    if(s.pvUser)document.getElementById('pvUser').value=s.pvUser;
+    if(s.pvPass)document.getElementById('pvPass').value=s.pvPass;
+    if(s.threshold!==undefined)document.getElementById('threshold').value=s.threshold;
+    return s;
+  }catch(e){return{};}
+}
+
+function saveSettings(){
+  const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};
+  localStorage.setItem('atm_cfg',JSON.stringify(s));
+  fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);
+  mobileView('dash');
+  setTimeout(fetchData,2000);
+}
+
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderList();}
-function mobileView(v){['settingsPanel','perativPanel','alertPanel'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('mobile-show',v==='set');});document.getElementById('navDash').classList.toggle('active',v==='dash');document.getElementById('navSet').classList.toggle('active',v==='set');const tl=document.getElementById('termList');const sw=document.querySelector('.search-wrap');if(tl)tl.style.display=v==='dash'?'':'none';if(sw)sw.style.display=v==='dash'?'':'none';}
-async function fetchData(){try{const res=await fetch(SERVER+'/api/data');const data=await res.json();atm_data_cache=data;terminals=data.terminals||[];const now=new Date();document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});renderList();renderStats(data);renderAlerts(data.alerts||[]);}catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}}
-async function doRefresh(){const btn=document.getElementById('refreshBtn');btn.classList.add('spinning');setLoading();try{await fetch(SERVER+'/api/refresh',{method:'POST'});await new Promise(r=>setTimeout(r,8000));await fetchData();}catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}btn.classList.remove('spinning');scheduleNextRefresh();}
-function scheduleNextRefresh(){if(autoRefreshTimer)clearTimeout(autoRefreshTimer);if(countdownTimer)clearInterval(countdownTimer);const INTERVAL=5*60*1000;nextRefreshTime=Date.now()+INTERVAL;autoRefreshTimer=setTimeout(()=>doRefresh(),INTERVAL);countdownTimer=setInterval(()=>{const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));const min=Math.floor(remaining/60);const sec=remaining%60;document.getElementById('nextRefresh').textContent='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');if(remaining===0)clearInterval(countdownTimer);},1000);}
+
+function mobileView(v){
+  ['settingsPanel','perativPanel','alertPanel'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('mobile-show',v==='set');});
+  document.getElementById('navDash').classList.toggle('active',v==='dash');
+  document.getElementById('navSet').classList.toggle('active',v==='set');
+  const tl=document.getElementById('termList');const sw=document.querySelector('.search-wrap');
+  if(tl)tl.style.display=v==='dash'?'':'none';
+  if(sw)sw.style.display=v==='dash'?'':'none';
+}
+
+async function fetchData(){
+  try{
+    const res=await fetch(SERVER+'/api/data');
+    const data=await res.json();
+    terminals=data.terminals||[];
+    const now=new Date();
+    document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});
+    renderList();renderStats();renderAlerts();renderOrderBanner();
+  }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
+}
+
+async function doRefresh(){
+  const btn=document.getElementById('refreshBtn');
+  btn.classList.add('spinning');setLoading();
+  try{
+    await fetch(SERVER+'/api/refresh',{method:'POST'});
+    await new Promise(r=>setTimeout(r,8000));
+    await fetchData();
+  }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
+  btn.classList.remove('spinning');scheduleNextRefresh();
+}
+
+function scheduleNextRefresh(){
+  if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
+  if(countdownTimer)clearInterval(countdownTimer);
+  const INTERVAL=5*60*1000;
+  nextRefreshTime=Date.now()+INTERVAL;
+  autoRefreshTimer=setTimeout(()=>doRefresh(),INTERVAL);
+  countdownTimer=setInterval(()=>{
+    const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));
+    const min=Math.floor(remaining/60);const sec=remaining%60;
+    document.getElementById('nextRefresh').textContent='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');
+    if(remaining===0)clearInterval(countdownTimer);
+  },1000);
+}
+
 function setLoading(){document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="state-text">Connexion aux guichets...</div></div>';}
-function renderStats(data){const t=data.terminals||[];let low=0,empty=0;t.forEach(terminal=>{const th=getThresholdForTerminal(terminal.terminal_id||terminal.name);const amt=terminal.amount;if(amt===0)empty++;else if(amt!==null&&amt<th)low++;});document.getElementById('sTotal').textContent=t.length||'—';document.getElementById('sLow').textContent=t.length?low:'—';document.getElementById('sEmpty').textContent=t.length?empty:'—';}
-function renderAlerts(alerts){const customAlerts=[];terminals.forEach(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;if(amt!==null&&amt!==undefined){if(amt===0)customAlerts.push({msg:'🚨 VIDE: '+t.name});else if(amt<th)customAlerts.push({msg:'⚠️ BAS: '+t.name+' — $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})});}});const b=document.getElementById('alertBanner');if(!customAlerts.length){b.classList.remove('show');return;}b.classList.add('show');document.getElementById('alertItems').innerHTML=customAlerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');}
-function renderList(){const q=document.getElementById('searchBox').value.toLowerCase();let list=terminals;if(activeFilter!=='all')list=list.filter(t=>t.source===activeFilter);if(q)list=list.filter(t=>(t.name||'').toLowerCase().includes(q));if(!list.length&&!terminals.length){document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">⚙️</div><div class="state-text">Configure tes accès dans <strong>Réglages</strong></div></div>';return;}if(!list.length){document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">🔍</div><div class="state-text">Aucun résultat</div></div>';return;}list=[...list].sort((a,b)=>{const thA=getThresholdForTerminal(a.terminal_id||a.name);const thB=getThresholdForTerminal(b.terminal_id||b.name);return rank(a,thA)-rank(b,thB);});const thresholds=getThresholds();const globalTh=JSON.parse(localStorage.getItem('atm_cfg')||'{}').threshold||500;document.getElementById('termList').innerHTML=list.map(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;let st,cls,disp;if(amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}else if(amt===0){st='empty';cls='empty';disp='$0';}else if(amt<th){st='low';cls='low';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}else{st='ok';cls='ok';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}const src=t.source==='myterminals'?'MyTerminals':'Perativ';const customTh=thresholds[id]!==undefined;const thLabel=customTh?'⚡ Seuil: $'+th:'Seuil: $'+th;const eName=t.name.replace(/'/g,"\\'");return'<div class="card '+st+'"><div class="card-info"><div class="card-name">'+t.name+'</div><div class="card-source">'+src+'</div><div class="card-threshold">'+thLabel+'</div></div><button class="edit-btn" onclick="openModal(\''+id+'\',\''+eName+'\')">✏️ Seuil</button><div class="card-amount '+cls+'">'+disp+'</div></div>';}).join('');}
+
+function renderStats(){
+  const t=terminals;let low=0,empty=0;
+  t.forEach(terminal=>{
+    const th=getThresholdForTerminal(terminal.terminal_id||terminal.name);
+    const amt=terminal.amount;
+    if(amt===0)empty++;
+    else if(amt!==null&&amt<th)low++;
+  });
+  document.getElementById('sTotal').textContent=t.length||'—';
+  document.getElementById('sLow').textContent=t.length?low:'—';
+  document.getElementById('sEmpty').textContent=t.length?empty:'—';
+}
+
+function renderOrderBanner(){
+  let totalToOrder=0;let count=0;
+  terminals.forEach(t=>{
+    const id=t.terminal_id||t.name;
+    const th=getThresholdForTerminal(id);
+    const amt=t.amount;
+    if(amt!==null&&amt<th){
+      totalToOrder+=(th-amt);
+      count++;
+    }
+  });
+  const banner=document.getElementById('orderBanner');
+  if(totalToOrder>0){
+    banner.style.display='block';
+    document.getElementById('orderTotal').textContent='$'+totalToOrder.toLocaleString('fr-CA',{maximumFractionDigits:0});
+    document.getElementById('orderCount').textContent=count+' guichet'+(count>1?'s':'')+' à remplir';
+  } else {
+    banner.style.display='none';
+  }
+}
+
+function renderAlerts(){
+  const customAlerts=[];
+  terminals.forEach(t=>{
+    const id=t.terminal_id||t.name;
+    const th=getThresholdForTerminal(id);
+    const amt=t.amount;
+    if(amt!==null&&amt!==undefined){
+      if(amt===0)customAlerts.push({msg:'🚨 VIDE: '+t.name+' — Commander $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0})});
+      else if(amt<th)customAlerts.push({msg:'⚠️ BAS: '+t.name+' — $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+' (commander $'+(th-amt).toLocaleString('fr-CA',{maximumFractionDigits:0})+')'});
+    }
+  });
+  const b=document.getElementById('alertBanner');
+  if(!customAlerts.length){b.classList.remove('show');return;}
+  b.classList.add('show');
+  document.getElementById('alertItems').innerHTML=customAlerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');
+}
+
+function renderList(){
+  const q=document.getElementById('searchBox').value.toLowerCase();
+  let list=terminals;
+  if(activeFilter!=='all')list=list.filter(t=>t.source===activeFilter);
+  if(q)list=list.filter(t=>(t.name||'').toLowerCase().includes(q));
+  if(!list.length&&!terminals.length){
+    document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">⚙️</div><div class="state-text">Configure tes accès dans <strong>Réglages</strong></div></div>';
+    return;
+  }
+  if(!list.length){
+    document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">🔍</div><div class="state-text">Aucun résultat</div></div>';
+    return;
+  }
+  list=[...list].sort((a,b)=>{
+    const thA=getThresholdForTerminal(a.terminal_id||a.name);
+    const thB=getThresholdForTerminal(b.terminal_id||b.name);
+    return rank(a,thA)-rank(b,thB);
+  });
+  const thresholds=getThresholds();
+  document.getElementById('termList').innerHTML=list.map(t=>{
+    const id=t.terminal_id||t.name;
+    const th=getThresholdForTerminal(id);
+    const amt=t.amount;
+    let st,cls,disp;
+    if(amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}
+    else if(amt===0){st='empty';cls='empty';disp='$0';}
+    else if(amt<th){st='low';cls='low';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}
+    else{st='ok';cls='ok';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}
+    const src=t.source==='myterminals'?'MyTerminals':'Perativ';
+    const customTh=thresholds[id]!==undefined;
+    const thLabel=(customTh?'⚡':'')+'Seuil: $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0});
+    const toOrder=(amt!==null&&amt<th)?(th-amt):0;
+    const toOrderStr=toOrder>0?'Commander: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0}):'';
+    const eName=t.name.replace(/'/g,"\\'");
+    return '<div class="card '+st+'">'
+      +'<div class="card-info">'
+        +'<div class="card-name">'+t.name+'</div>'
+        +'<div class="card-source">'+src+'</div>'
+        +'<div class="card-meta"><span>'+thLabel+'</span>'+(toOrderStr?'<span class="to-order">'+toOrderStr+'</span>':'')+'</div>'
+      +'</div>'
+      +'<button class="edit-btn" onclick="openModal(\''+id+'\',\''+eName+'\')">✏️ Seuil</button>'
+      +'<div class="card-amounts">'
+        +'<div class="card-amount '+cls+'">'+disp+'</div>'
+        +(toOrder>0?'<div class="card-order">+$'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'</div>':'')
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
 function rank(t,th){if(t.amount===0)return 0;if(t.amount!==null&&t.amount<th)return 1;return 2;}
+
 loadSettings();fetchData();scheduleNextRefresh();
 </script>
 </body>
