@@ -32,7 +32,6 @@ def scrape_myterminals(user, pwd):
         browser = p.chromium.launch(headless=True, args=["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"])
         page = browser.new_page()
         try:
-            # Login
             page.goto("https://secure.myterminals.com/SPS/login/login.aspx?ReturnUrl=%2FSPS%2Fdefault.aspx", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=15000)
             page.fill("input[type=text]", user)
@@ -41,27 +40,49 @@ def scrape_myterminals(user, pwd):
             page.wait_for_load_state("networkidle", timeout=15000)
             print(f"MT after login: {page.url}")
 
-            # Click Terminal Management
-            page.click("text=Terminal Management")
+            # Try multiple ways to click Terminal Management
+            clicked = False
+            for selector in [
+                "a:has-text('Terminal Management')",
+                "td:has-text('Terminal Management')",
+                "span:has-text('Terminal Management')",
+                "text=Terminal Management",
+                "//a[contains(text(),'Terminal Management')]",
+                "//td[contains(text(),'Terminal Management')]",
+            ]:
+                try:
+                    page.click(selector, timeout=5000)
+                    clicked = True
+                    print(f"MT clicked with: {selector}")
+                    break
+                except:
+                    continue
+
+            if not clicked:
+                print("MT could not click Terminal Management, trying all links")
+                links = page.query_selector_all("a")
+                for link in links:
+                    text = link.inner_text().strip()
+                    print(f"MT link: {text}")
+                    if "terminal" in text.lower() and "manage" in text.lower():
+                        link.click()
+                        clicked = True
+                        break
+
             page.wait_for_load_state("networkidle", timeout=15000)
             page.wait_for_timeout(2000)
-            print(f"MT after click: {page.url}")
 
-            # Find the table
+            # Get table rows
             rows = page.query_selector_all("table tr")
-            print(f"MT rows found: {len(rows)}")
+            print(f"MT rows: {len(rows)}")
 
             if rows:
-                # Get headers from first row
                 headers = [th.inner_text().strip().lower() for th in rows[0].query_selector_all("th,td")]
                 print(f"MT headers: {headers}")
 
-                # Find column indices
                 name_idx = next((i for i,h in enumerate(headers) if "location" in h), 1)
                 amount_idx = next((i for i,h in enumerate(headers) if "total cassette" in h or "cassette value" in h), None)
-                id_idx = next((i for i,h in enumerate(headers) if "terminal id" in h or "terminal" == h), 0)
-
-                print(f"MT cols - id:{id_idx} name:{name_idx} amount:{amount_idx}")
+                id_idx = 0
 
                 for row in rows[1:]:
                     cells = [td.inner_text().strip() for td in row.query_selector_all("td")]
@@ -71,7 +92,6 @@ def scrape_myterminals(user, pwd):
                     amount = None
                     if amount_idx is not None and amount_idx < len(cells):
                         amount = find_amount(cells[amount_idx])
-                    
                     terminals.append({
                         "source": "myterminals",
                         "name": name,
@@ -95,19 +115,17 @@ def scrape_perativ(user, pwd):
             page.goto("https://webapps.perativ.com/Account/Login", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=10000)
             page.wait_for_timeout(2000)
-            print(f"PV login: {page.url}")
 
-            # Try different input selectors
-            for selector in ["input[name='UserName']", "input[type='text']", "input[id='UserName']", "#UserName"]:
+            for selector in ["input[name='UserName']", "input[type='text']", "#UserName", "input[placeholder*='ser']"]:
                 try:
                     page.fill(selector, user, timeout=5000)
-                    print(f"PV filled username with: {selector}")
+                    print(f"PV filled: {selector}")
                     break
                 except: continue
 
             page.fill("input[type='password']", pwd)
 
-            for selector in ["button[type='submit']", "input[type='submit']", "button:has-text('Login')", "button:has-text('Sign')"]:
+            for selector in ["button[type='submit']","input[type='submit']","button:has-text('Login')","button:has-text('Sign')"]:
                 try:
                     page.click(selector, timeout=3000)
                     break
@@ -115,19 +133,16 @@ def scrape_perativ(user, pwd):
 
             page.wait_for_load_state("networkidle", timeout=15000)
             page.wait_for_timeout(3000)
-            print(f"PV after login: {page.url} title: {page.title()}")
+            print(f"PV after login: {page.url}")
 
-            # Get all table rows
             rows = page.query_selector_all("table tr")
             print(f"PV rows: {len(rows)}")
 
             if rows:
                 headers = [th.inner_text().strip().lower() for th in rows[0].query_selector_all("th,td")]
                 print(f"PV headers: {headers}")
-
                 name_idx = next((i for i,h in enumerate(headers) if "location" in h or "name" in h), 0)
                 amount_idx = next((i for i,h in enumerate(headers) if "available" in h or "cash" in h or "balance" in h), None)
-
                 for row in rows[1:]:
                     cells = [td.inner_text().strip() for td in row.query_selector_all("td")]
                     if not cells or len(cells) < 2: continue
@@ -150,22 +165,18 @@ def refresh():
     all_t, errors = [], []
     mt = creds["myterminals"]; pv = creds["perativ"]; th = creds["threshold"]
     print(f"=== Refresh MT:{mt['username']} PV:{pv['username']} ===")
-
     if mt.get("username"):
         try: all_t += scrape_myterminals(mt["username"], mt["password"])
         except Exception as e: errors.append(f"MT:{e}"); print(f"MT error:{e}")
-
     if pv.get("username"):
         try: all_t += scrape_perativ(pv["username"], pv["password"])
         except Exception as e: errors.append(f"PV:{e}"); print(f"PV error:{e}")
-
     alerts = []
     for t in all_t:
         amt = t.get("amount")
         if amt is not None:
-            if amt == 0: alerts.append({"type":"empty","name":t["name"],"amount":amt,"msg":f"🚨 VIDE: {t['name']}"})
-            elif amt < th: alerts.append({"type":"low","name":t["name"],"amount":amt,"msg":f"⚠️ BAS: {t['name']} — ${amt:,.0f}"})
-
+            if amt == 0: alerts.append({"type":"empty","name":t["name"],"amount":amt,"msg":f"VIDE: {t['name']}"})
+            elif amt < th: alerts.append({"type":"low","name":t["name"],"amount":amt,"msg":f"BAS: {t['name']} - ${amt:,.0f}"})
     atm_data = {"terminals":all_t,"alerts":alerts,"last_updated":datetime.now().isoformat(),"errors":errors}
     print(f"=== Done:{len(all_t)} terminals,{len(alerts)} alerts ===")
 
