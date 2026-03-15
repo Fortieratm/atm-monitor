@@ -14,7 +14,7 @@
 body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;}
 .header{position:sticky;top:0;z-index:50;background:rgba(8,12,16,0.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,12px) 24px 0;}
 .header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px;}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.logo{height:36px;filter:invert(1);object-fit:contain;}
 .header-right{display:flex;align-items:center;gap:12px;}
 .sync-time{font-size:11px;color:var(--muted);text-align:right;line-height:1.4;}
 .refresh-btn{width:40px;height:40px;border-radius:12px;background:var(--card2);border:1px solid var(--border);color:var(--green);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
@@ -63,8 +63,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .search-input::placeholder{color:var(--muted);}
 .next-refresh{font-size:10px;color:var(--muted);text-align:center;padding:4px 0 8px;}
 .right-panel{flex:1;min-width:0;}
-
-/* FILL LIST BAR */
 .fill-bar{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:12px;display:none;}
 .fill-bar.show{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 .fill-bar-info{font-size:12px;color:var(--text);}
@@ -73,8 +71,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .fill-export-btn{padding:8px 14px;border-radius:8px;border:none;background:var(--green);color:#000;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;}
 .fill-clear-btn{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;}
 .fill-clear-btn:hover{border-color:var(--red);color:var(--red);}
-
-/* TERMINAL CARDS */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;position:relative;overflow:hidden;transition:all 0.15s;cursor:pointer;}
 .card:hover{border-color:var(--muted);}
 .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
@@ -95,8 +91,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .card-order{font-size:11px;color:#ff8800;text-align:right;}
 .edit-btn{background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:5px 10px;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;transition:all 0.15s;flex-shrink:0;}
 .edit-btn:hover{border-color:var(--green);color:var(--green);}
-
-/* EXPORT MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.show{display:flex;}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto;}
@@ -108,8 +102,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .modal-save{flex:1;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--green),var(--blue));color:#000;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;}
 .modal-cancel{flex:1;padding:13px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;}
 .modal-reset{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;cursor:pointer;text-decoration:underline;}
-
-/* EXPORT LIST */
 .export-list{background:var(--card2);border-radius:10px;padding:16px;margin-bottom:16px;font-size:12px;line-height:2;white-space:pre-wrap;word-break:break-all;}
 .export-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .export-action-btn{flex:1;padding:12px;border-radius:10px;border:none;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;min-width:120px;}
@@ -117,7 +109,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .btn-sms{background:var(--green);color:#000;}
 .btn-email{background:var(--yellow);color:#000;}
 .btn-close{background:transparent;border:1px solid var(--border)!important;color:var(--muted);}
-
 .state-box{text-align:center;padding:48px 20px;color:var(--muted);}
 .state-icon{font-size:52px;margin-bottom:14px;}
 .state-text{font-size:13px;line-height:1.7;}
@@ -136,7 +127,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 <body>
 <div class="header">
   <div class="header-inner">
-    <div class="logo">ATM CYBER 25 INC.</div>
+    <img src="/Cyber_25.jpg" class="logo" alt="ATM CYBER 25 INC.">
     <div class="header-right">
       <div class="sync-time" id="syncTime">Chargement...</div>
       <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()" title="Rafraîchir">↻</button>
@@ -184,16 +175,15 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
   </div>
   <div class="right-panel">
     <div class="search-wrap">
-      <input class="search-input" type="search" placeholder="🔍 Rechercher... (cliquer sur un guichet pour l'ajouter à la liste)" id="searchBox" oninput="renderList()">
+      <input class="search-input" type="search" placeholder="🔍 Rechercher... (cliquer pour ajouter à la liste)" id="searchBox" oninput="renderList()">
     </div>
     <div class="fill-bar" id="fillBar">
-      <div class="fill-bar-info">📋 <span id="fillCount">0</span> guichet(s) sélectionné(s) — Total: <span id="fillTotal" class="c-orange">$0</span></div>
+      <div class="fill-bar-info">📋 <span id="fillCount">0</span> guichet(s) — Total: <span id="fillTotal" class="c-orange">$0</span></div>
       <div class="fill-bar-btns">
         <button class="fill-export-btn" onclick="showExport()">📤 Exporter</button>
         <button class="fill-clear-btn" onclick="clearSelection()">✕ Vider</button>
       </div>
     </div>
-    <div class="next-refresh" id="nextRefresh2"></div>
     <div id="termList">
       <div class="state-box">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -206,8 +196,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
   <button class="nav-btn active" id="navDash" onclick="mobileView('dash')"><span class="nav-icon">📊</span>Dashboard</button>
   <button class="nav-btn" id="navSet" onclick="mobileView('set')"><span class="nav-icon">⚙️</span>Réglages</button>
 </div>
-
-<!-- THRESHOLD MODAL -->
 <div class="modal-overlay" id="thresholdModal">
   <div class="modal">
     <div class="modal-title">Seuil d'alerte</div>
@@ -220,8 +208,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
     <div class="modal-reset" onclick="resetThreshold()">Utiliser le seuil global</div>
   </div>
 </div>
-
-<!-- EXPORT MODAL -->
 <div class="modal-overlay" id="exportModal">
   <div class="modal">
     <div class="modal-title">📋 Liste de remplissage</div>
@@ -235,328 +221,47 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
     </div>
   </div>
 </div>
-
 <script>
 const SERVER='https://atm-monitor-production.up.railway.app';
-const BASE_LAT=45.1253; // Sutton, QC - 161 rue Principale Sud
+const BASE_LAT=45.1253;
 const BASE_LNG=-72.6089;
-
 let terminals=[],activeFilter='all';
 let autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null;
-let currentModalId=null;
-let selectedIds=new Set();
-
-// COORDINATES for known cities
-const CITY_COORDS={
-  'sherbrooke':{lat:45.4042,lng:-71.8929},
-  'sutton':{lat:45.1253,lng:-72.6089},
-  'brome':{lat:45.1800,lng:-72.5200},
-  'magog':{lat:45.2667,lng:-72.1500},
-  'granby':{lat:45.4000,lng:-72.7333},
-  'windsor':{lat:45.5667,lng:-71.9833},
-  'waterville':{lat:45.2667,lng:-71.9000},
-  'coaticook':{lat:45.1333,lng:-71.8000},
-  'cowansville':{lat:45.2000,lng:-72.7500},
-  'lac-megantic':{lat:45.5833,lng:-70.8833},
-  'ascot corner':{lat:45.4833,lng:-71.7000},
-  'east angus':{lat:45.4833,lng:-71.6667},
-};
-
-function getCoords(terminal){
-  const city=(terminal.city||'').toLowerCase().trim();
-  if(CITY_COORDS[city])return CITY_COORDS[city];
-  // Try partial match
-  for(const [k,v] of Object.entries(CITY_COORDS)){
-    if(city.includes(k)||k.includes(city))return v;
-  }
-  return null;
-}
-
-function distanceKm(lat1,lng1,lat2,lng2){
-  const R=6371;
-  const dLat=(lat2-lat1)*Math.PI/180;
-  const dLng=(lng2-lng1)*Math.PI/180;
-  const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-
-function getDistance(terminal){
-  const coords=getCoords(terminal);
-  if(!coords)return 9999;
-  return distanceKm(BASE_LAT,BASE_LNG,coords.lat,coords.lng);
-}
-
-// THRESHOLDS
+let currentModalId=null,selectedIds=new Set();
+const CITY_COORDS={'sherbrooke':{lat:45.4042,lng:-71.8929},'sutton':{lat:45.1253,lng:-72.6089},'brome':{lat:45.1800,lng:-72.5200},'magog':{lat:45.2667,lng:-72.1500},'granby':{lat:45.4000,lng:-72.7333},'windsor':{lat:45.5667,lng:-71.9833},'waterville':{lat:45.2667,lng:-71.9000},'coaticook':{lat:45.1333,lng:-71.8000},'cowansville':{lat:45.2000,lng:-72.7500},'lac-megantic':{lat:45.5833,lng:-70.8833},'ascot corner':{lat:45.4833,lng:-71.7000},'east angus':{lat:45.4833,lng:-71.6667}};
+function getCoords(t){const city=(t.city||'').toLowerCase().trim();if(CITY_COORDS[city])return CITY_COORDS[city];for(const[k,v]of Object.entries(CITY_COORDS)){if(city.includes(k)||k.includes(city))return v;}return null;}
+function distanceKm(la1,lo1,la2,lo2){const R=6371,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180,a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+function getDistance(t){const c=getCoords(t);if(!c)return 9999;return distanceKm(BASE_LAT,BASE_LNG,c.lat,c.lng);}
 function getThresholds(){try{return JSON.parse(localStorage.getItem('atm_thresholds')||'{}');}catch(e){return{};}}
-function setThresholdForTerminal(id,value){const t=getThresholds();if(value===null)delete t[id];else t[id]=value;localStorage.setItem('atm_thresholds',JSON.stringify(t));}
+function setThresholdForTerminal(id,v){const t=getThresholds();if(v===null)delete t[id];else t[id]=v;localStorage.setItem('atm_thresholds',JSON.stringify(t));}
 function getThresholdForTerminal(id){const t=getThresholds();const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');return t[id]!==undefined?t[id]:(s.threshold||500);}
-
-// THRESHOLD MODAL
-function openThresholdModal(e,id,name){
-  e.stopPropagation();
-  currentModalId=id;
-  const t=getThresholds();
-  const globalTh=JSON.parse(localStorage.getItem('atm_cfg')||'{}').threshold||500;
-  document.getElementById('modalName').textContent=name;
-  document.getElementById('modalInput').value=t[id]!==undefined?t[id]:'';
-  document.getElementById('modalInput').placeholder='Seuil global: $'+globalTh;
-  document.getElementById('thresholdModal').classList.add('show');
-  setTimeout(()=>document.getElementById('modalInput').focus(),100);
-}
+function openThresholdModal(e,id,name){e.stopPropagation();currentModalId=id;const t=getThresholds();const g=JSON.parse(localStorage.getItem('atm_cfg')||'{}').threshold||500;document.getElementById('modalName').textContent=name;document.getElementById('modalInput').value=t[id]!==undefined?t[id]:'';document.getElementById('modalInput').placeholder='Seuil global: $'+g;document.getElementById('thresholdModal').classList.add('show');setTimeout(()=>document.getElementById('modalInput').focus(),100);}
 function closeThresholdModal(){document.getElementById('thresholdModal').classList.remove('show');currentModalId=null;}
-function saveThreshold(){const val=parseInt(document.getElementById('modalInput').value);if(!isNaN(val)&&val>=0){setThresholdForTerminal(currentModalId,val);closeThresholdModal();renderList();renderStats();renderOrderBanner();}}
+function saveThreshold(){const v=parseInt(document.getElementById('modalInput').value);if(!isNaN(v)&&v>=0){setThresholdForTerminal(currentModalId,v);closeThresholdModal();renderList();renderStats();renderOrderBanner();}}
 function resetThreshold(){setThresholdForTerminal(currentModalId,null);closeThresholdModal();renderList();renderStats();renderOrderBanner();}
 document.getElementById('thresholdModal').addEventListener('click',function(e){if(e.target===this)closeThresholdModal();});
-
-// SELECTION
-function toggleSelect(id){
-  if(selectedIds.has(id))selectedIds.delete(id);
-  else selectedIds.add(id);
-  renderList();
-  updateFillBar();
-}
-
-function updateFillBar(){
-  const bar=document.getElementById('fillBar');
-  if(selectedIds.size===0){bar.classList.remove('show');return;}
-  bar.classList.add('show');
-  let total=0;
-  selectedIds.forEach(id=>{
-    const t=terminals.find(t=>(t.terminal_id||t.name)===id);
-    if(t){
-      const th=getThresholdForTerminal(id);
-      const amt=t.amount||0;
-      if(amt<th)total+=(th-amt);
-    }
-  });
-  document.getElementById('fillCount').textContent=selectedIds.size;
-  document.getElementById('fillTotal').textContent='$'+total.toLocaleString('fr-CA',{maximumFractionDigits:0});
-}
-
+function toggleSelect(id){if(selectedIds.has(id))selectedIds.delete(id);else selectedIds.add(id);renderList();updateFillBar();}
+function updateFillBar(){const bar=document.getElementById('fillBar');if(selectedIds.size===0){bar.classList.remove('show');return;}bar.classList.add('show');let total=0;selectedIds.forEach(id=>{const t=terminals.find(t=>(t.terminal_id||t.name)===id);if(t){const th=getThresholdForTerminal(id);const amt=t.amount||0;if(amt<th)total+=(th-amt);}});document.getElementById('fillCount').textContent=selectedIds.size;document.getElementById('fillTotal').textContent='$'+total.toLocaleString('fr-CA',{maximumFractionDigits:0});}
 function clearSelection(){selectedIds.clear();renderList();updateFillBar();}
-
-// EXPORT
-function showExport(){
-  // Get selected terminals sorted by distance from Sutton
-  const selected=terminals
-    .filter(t=>selectedIds.has(t.terminal_id||t.name))
-    .map(t=>({...t,distance:getDistance(t)}))
-    .sort((a,b)=>a.distance-b.distance);
-
-  const now=new Date();
-  let text='🏧 ATM CYBER 25 INC.\n';
-  text+='Liste de remplissage\n';
-  text+=now.toLocaleDateString('fr-CA')+' '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})+'\n';
-  text+='━━━━━━━━━━━━━━━━━━━━\n\n';
-
-  let totalOrder=0;
-  selected.forEach((t,i)=>{
-    const id=t.terminal_id||t.name;
-    const th=getThresholdForTerminal(id);
-    const amt=t.amount||0;
-    const toOrder=Math.max(0,th-amt);
-    totalOrder+=toOrder;
-    const dist=t.distance<9999?(' (~'+t.distance.toFixed(0)+'km)'):'';
-    text+=(i+1)+'. '+t.name+dist+'\n';
-    if(t.city)text+='   📍 '+t.city+'\n';
-    text+='   💵 En caisse: $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';
-    text+='   📦 À mettre: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n\n';
-  });
-
-  text+='━━━━━━━━━━━━━━━━━━━━\n';
-  text+='💰 TOTAL À COMMANDER: $'+totalOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';
-  text+=selected.length+' guichet'+(selected.length>1?'s':'')+' à remplir';
-
-  document.getElementById('exportText').textContent=text;
-  document.getElementById('exportModal').classList.add('show');
-}
-
+function showExport(){const selected=terminals.filter(t=>selectedIds.has(t.terminal_id||t.name)).map(t=>({...t,distance:getDistance(t)})).sort((a,b)=>a.distance-b.distance);const now=new Date();let text='🏧 ATM CYBER 25 INC.\n';text+='Liste de remplissage\n';text+=now.toLocaleDateString('fr-CA')+' '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})+'\n';text+='━━━━━━━━━━━━━━━━━━━━\n\n';let totalOrder=0;selected.forEach((t,i)=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount||0;const toOrder=Math.max(0,th-amt);totalOrder+=toOrder;const dist=t.distance<9999?' (~'+t.distance.toFixed(0)+'km)':'';text+=(i+1)+'. '+t.name+dist+'\n';if(t.city)text+='   📍 '+t.city+'\n';text+='   💵 En caisse: $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';text+='   📦 À mettre: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n\n';});text+='━━━━━━━━━━━━━━━━━━━━\n';text+='💰 TOTAL: $'+totalOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';text+=selected.length+' guichet'+(selected.length>1?'s':'')+' à remplir';document.getElementById('exportText').textContent=text;document.getElementById('exportModal').classList.add('show');}
 function closeExportModal(){document.getElementById('exportModal').classList.remove('show');}
 document.getElementById('exportModal').addEventListener('click',function(e){if(e.target===this)closeExportModal();});
-
-function copyList(){
-  const text=document.getElementById('exportText').textContent;
-  navigator.clipboard.writeText(text).then(()=>{
-    const btn=document.querySelector('.btn-copy');
-    btn.textContent='✅ Copié!';
-    setTimeout(()=>{btn.textContent='📋 Copier';},2000);
-  });
-}
-
-function sendSMS(){
-  const text=encodeURIComponent(document.getElementById('exportText').textContent);
-  window.open('sms:?body='+text);
-}
-
-function sendEmail(){
-  const text=encodeURIComponent(document.getElementById('exportText').textContent);
-  const subject=encodeURIComponent('ATM CYBER 25 - Liste de remplissage');
-  window.open('mailto:?subject='+subject+'&body='+text);
-}
-
-// SETTINGS
-function loadSettings(){
-  try{
-    const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
-    if(s.mtUser)document.getElementById('mtUser').value=s.mtUser;
-    if(s.mtPass)document.getElementById('mtPass').value=s.mtPass;
-    if(s.pvUser)document.getElementById('pvUser').value=s.pvUser;
-    if(s.pvPass)document.getElementById('pvPass').value=s.pvPass;
-    if(s.threshold!==undefined)document.getElementById('threshold').value=s.threshold;
-    return s;
-  }catch(e){return{};}
-}
-
-function saveSettings(){
-  const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};
-  localStorage.setItem('atm_cfg',JSON.stringify(s));
-  fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);
-  mobileView('dash');setTimeout(fetchData,2000);
-}
-
+function copyList(){const text=document.getElementById('exportText').textContent;navigator.clipboard.writeText(text).then(()=>{const btn=document.querySelector('.btn-copy');btn.textContent='✅ Copié!';setTimeout(()=>{btn.textContent='📋 Copier';},2000);});}
+function sendSMS(){window.open('sms:?body='+encodeURIComponent(document.getElementById('exportText').textContent));}
+function sendEmail(){window.open('mailto:?subject='+encodeURIComponent('ATM CYBER 25 - Liste de remplissage')+'&body='+encodeURIComponent(document.getElementById('exportText').textContent));}
+function loadSettings(){try{const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');if(s.mtUser)document.getElementById('mtUser').value=s.mtUser;if(s.mtPass)document.getElementById('mtPass').value=s.mtPass;if(s.pvUser)document.getElementById('pvUser').value=s.pvUser;if(s.pvPass)document.getElementById('pvPass').value=s.pvPass;if(s.threshold!==undefined)document.getElementById('threshold').value=s.threshold;return s;}catch(e){return{};}}
+function saveSettings(){const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};localStorage.setItem('atm_cfg',JSON.stringify(s));fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);mobileView('dash');setTimeout(fetchData,2000);}
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderList();}
-
-function mobileView(v){
-  ['settingsPanel','perativPanel','alertPanel'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('mobile-show',v==='set');});
-  document.getElementById('navDash').classList.toggle('active',v==='dash');
-  document.getElementById('navSet').classList.toggle('active',v==='set');
-  const tl=document.getElementById('termList');const sw=document.querySelector('.search-wrap');
-  if(tl)tl.style.display=v==='dash'?'':'none';
-  if(sw)sw.style.display=v==='dash'?'':'none';
-}
-
-async function fetchData(){
-  try{
-    const res=await fetch(SERVER+'/api/data');
-    const data=await res.json();
-    terminals=data.terminals||[];
-    const now=new Date();
-    document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});
-    renderList();renderStats();renderAlerts();renderOrderBanner();updateFillBar();
-  }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
-}
-
-async function doRefresh(){
-  const btn=document.getElementById('refreshBtn');
-  btn.classList.add('spinning');setLoading();
-  try{
-    await fetch(SERVER+'/api/refresh',{method:'POST'});
-    await new Promise(r=>setTimeout(r,8000));
-    await fetchData();
-  }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
-  btn.classList.remove('spinning');scheduleNextRefresh();
-}
-
-function scheduleNextRefresh(){
-  if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
-  if(countdownTimer)clearInterval(countdownTimer);
-  const INTERVAL=5*60*1000;
-  nextRefreshTime=Date.now()+INTERVAL;
-  autoRefreshTimer=setTimeout(()=>doRefresh(),INTERVAL);
-  countdownTimer=setInterval(()=>{
-    const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));
-    const min=Math.floor(remaining/60);const sec=remaining%60;
-    const txt='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');
-    document.getElementById('nextRefresh').textContent=txt;
-    if(document.getElementById('nextRefresh2'))document.getElementById('nextRefresh2').textContent=txt;
-    if(remaining===0)clearInterval(countdownTimer);
-  },1000);
-}
-
+function mobileView(v){['settingsPanel','perativPanel','alertPanel'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('mobile-show',v==='set');});document.getElementById('navDash').classList.toggle('active',v==='dash');document.getElementById('navSet').classList.toggle('active',v==='set');const tl=document.getElementById('termList');const sw=document.querySelector('.search-wrap');if(tl)tl.style.display=v==='dash'?'':'none';if(sw)sw.style.display=v==='dash'?'':'none';}
+async function fetchData(){try{const res=await fetch(SERVER+'/api/data');const data=await res.json();terminals=data.terminals||[];const now=new Date();document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});renderList();renderStats();renderAlerts();renderOrderBanner();updateFillBar();}catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}}
+async function doRefresh(){const btn=document.getElementById('refreshBtn');btn.classList.add('spinning');setLoading();try{await fetch(SERVER+'/api/refresh',{method:'POST'});await new Promise(r=>setTimeout(r,8000));await fetchData();}catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}btn.classList.remove('spinning');scheduleNextRefresh();}
+function scheduleNextRefresh(){if(autoRefreshTimer)clearTimeout(autoRefreshTimer);if(countdownTimer)clearInterval(countdownTimer);const INTERVAL=5*60*1000;nextRefreshTime=Date.now()+INTERVAL;autoRefreshTimer=setTimeout(()=>doRefresh(),INTERVAL);countdownTimer=setInterval(()=>{const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));const min=Math.floor(remaining/60);const sec=remaining%60;document.getElementById('nextRefresh').textContent='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');if(remaining===0)clearInterval(countdownTimer);},1000);}
 function setLoading(){document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="state-text">Connexion aux guichets...</div></div>';}
-
-function renderStats(){
-  let low=0,empty=0,totalCash=0,count=0;
-  terminals.forEach(t=>{
-    const th=getThresholdForTerminal(t.terminal_id||t.name);
-    const amt=t.amount;
-    if(amt!==null&&amt!==undefined){totalCash+=amt;count++;if(amt===0)empty++;else if(amt<th)low++;}
-  });
-  document.getElementById('sTotal').textContent=terminals.length||'—';
-  document.getElementById('sCash').textContent=count>0?'$'+totalCash.toLocaleString('fr-CA',{maximumFractionDigits:0}):'—';
-  document.getElementById('sLow').textContent=terminals.length?low:'—';
-  document.getElementById('sEmpty').textContent=terminals.length?empty:'—';
-}
-
-function renderOrderBanner(){
-  let totalToOrder=0,count=0;
-  terminals.forEach(t=>{
-    const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;
-    if(amt!==null&&amt<th){totalToOrder+=(th-amt);count++;}
-  });
-  const banner=document.getElementById('orderBanner');
-  if(totalToOrder>0){
-    banner.style.display='block';
-    document.getElementById('orderTotal').textContent='$'+totalToOrder.toLocaleString('fr-CA',{maximumFractionDigits:0});
-    document.getElementById('orderCount').textContent=count+' guichet'+(count>1?'s':'')+' à remplir';
-  }else{banner.style.display='none';}
-}
-
-function renderAlerts(){
-  const alerts=[];
-  terminals.forEach(t=>{
-    const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;
-    if(amt!==null&&amt!==undefined){
-      if(amt===0)alerts.push({msg:'🚨 VIDE: '+t.name+' — Commander $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0})});
-      else if(amt<th)alerts.push({msg:'⚠️ BAS: '+t.name+' — $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+' (commander $'+(th-amt).toLocaleString('fr-CA',{maximumFractionDigits:0})+')'});
-    }
-  });
-  const b=document.getElementById('alertBanner');
-  if(!alerts.length){b.classList.remove('show');return;}
-  b.classList.add('show');
-  document.getElementById('alertItems').innerHTML=alerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');
-}
-
-function renderList(){
-  const q=document.getElementById('searchBox').value.toLowerCase();
-  let list=terminals;
-  if(activeFilter!=='all')list=list.filter(t=>t.source===activeFilter);
-  if(q)list=list.filter(t=>(t.name||'').toLowerCase().includes(q));
-  if(!list.length&&!terminals.length){
-    document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">⚙️</div><div class="state-text">Configure tes accès dans <strong>Réglages</strong></div></div>';
-    return;
-  }
-  if(!list.length){
-    document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">🔍</div><div class="state-text">Aucun résultat</div></div>';
-    return;
-  }
-  list=[...list].sort((a,b)=>rank(a,getThresholdForTerminal(a.terminal_id||a.name))-rank(b,getThresholdForTerminal(b.terminal_id||b.name)));
-  const thresholds=getThresholds();
-  document.getElementById('termList').innerHTML=list.map(t=>{
-    const id=t.terminal_id||t.name;
-    const th=getThresholdForTerminal(id);
-    const amt=t.amount;
-    let st,cls,disp;
-    if(amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}
-    else if(amt===0){st='empty';cls='empty';disp='$0';}
-    else if(amt<th){st='low';cls='low';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}
-    else{st='ok';cls='ok';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}
-    const src=t.source==='myterminals'?'MyTerminals':'Perativ';
-    const customTh=thresholds[id]!==undefined;
-    const thLabel=(customTh?'⚡':'')+'Seuil: $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0});
-    const toOrder=(amt!==null&&amt<th)?(th-amt):0;
-    const toOrderStr=toOrder>0?'Commander: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0}):'';
-    const isSelected=selectedIds.has(id);
-    const eName=t.name.replace(/'/g,"\\'");
-    const checkMark=isSelected?'✓':'';
-    return '<div class="card '+st+(isSelected?' selected':'')+'" onclick="toggleSelect(\''+id+'\')">'
-      +'<div class="card-check">'+checkMark+'</div>'
-      +'<div class="card-info">'
-        +'<div class="card-name">'+t.name+'</div>'
-        +'<div class="card-source">'+src+(t.city?' · '+t.city:'')+'</div>'
-        +'<div class="card-meta"><span>'+thLabel+'</span>'+(toOrderStr?'<span class="to-order">'+toOrderStr+'</span>':'')+'</div>'
-      +'</div>'
-      +'<button class="edit-btn" onclick="openThresholdModal(event,\''+id+'\',\''+eName+'\')">✏️</button>'
-      +'<div class="card-amounts">'
-        +'<div class="card-amount '+cls+'">'+disp+'</div>'
-        +(toOrder>0?'<div class="card-order">+$'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'</div>':'')
-      +'</div>'
-    +'</div>';
-  }).join('');
-}
-
+function renderStats(){let low=0,empty=0,totalCash=0,count=0;terminals.forEach(t=>{const th=getThresholdForTerminal(t.terminal_id||t.name);const amt=t.amount;if(amt!==null&&amt!==undefined){totalCash+=amt;count++;if(amt===0)empty++;else if(amt<th)low++;}});document.getElementById('sTotal').textContent=terminals.length||'—';document.getElementById('sCash').textContent=count>0?'$'+totalCash.toLocaleString('fr-CA',{maximumFractionDigits:0}):'—';document.getElementById('sLow').textContent=terminals.length?low:'—';document.getElementById('sEmpty').textContent=terminals.length?empty:'—';}
+function renderOrderBanner(){let totalToOrder=0,count=0;terminals.forEach(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;if(amt!==null&&amt<th){totalToOrder+=(th-amt);count++;}});const banner=document.getElementById('orderBanner');if(totalToOrder>0){banner.style.display='block';document.getElementById('orderTotal').textContent='$'+totalToOrder.toLocaleString('fr-CA',{maximumFractionDigits:0});document.getElementById('orderCount').textContent=count+' guichet'+(count>1?'s':'')+' à remplir';}else{banner.style.display='none';}}
+function renderAlerts(){const alerts=[];terminals.forEach(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;if(amt!==null&&amt!==undefined){if(amt===0)alerts.push({msg:'🚨 VIDE: '+t.name+' — Commander $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0})});else if(amt<th)alerts.push({msg:'⚠️ BAS: '+t.name+' — $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+' (commander $'+(th-amt).toLocaleString('fr-CA',{maximumFractionDigits:0})+')'});}});const b=document.getElementById('alertBanner');if(!alerts.length){b.classList.remove('show');return;}b.classList.add('show');document.getElementById('alertItems').innerHTML=alerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');}
+function renderList(){const q=document.getElementById('searchBox').value.toLowerCase();let list=terminals;if(activeFilter!=='all')list=list.filter(t=>t.source===activeFilter);if(q)list=list.filter(t=>(t.name||'').toLowerCase().includes(q));if(!list.length&&!terminals.length){document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">⚙️</div><div class="state-text">Configure tes accès dans <strong>Réglages</strong></div></div>';return;}if(!list.length){document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">🔍</div><div class="state-text">Aucun résultat</div></div>';return;}list=[...list].sort((a,b)=>rank(a,getThresholdForTerminal(a.terminal_id||a.name))-rank(b,getThresholdForTerminal(b.terminal_id||b.name)));const thresholds=getThresholds();document.getElementById('termList').innerHTML=list.map(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;let st,cls,disp;if(amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}else if(amt===0){st='empty';cls='empty';disp='$0';}else if(amt<th){st='low';cls='low';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}else{st='ok';cls='ok';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}const src=t.source==='myterminals'?'MyTerminals':'Perativ';const customTh=thresholds[id]!==undefined;const thLabel=(customTh?'⚡':'')+'Seuil: $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0});const toOrder=(amt!==null&&amt<th)?(th-amt):0;const toOrderStr=toOrder>0?'Commander: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0}):'';const isSelected=selectedIds.has(id);const eName=t.name.replace(/'/g,"\\'");return'<div class="card '+st+(isSelected?' selected':'')+'" onclick="toggleSelect(\''+id+'\')">'+'<div class="card-check">'+(isSelected?'✓':'')+'</div>'+'<div class="card-info"><div class="card-name">'+t.name+'</div><div class="card-source">'+src+(t.city?' · '+t.city:'')+'</div><div class="card-meta"><span>'+thLabel+'</span>'+(toOrderStr?'<span class="to-order">'+toOrderStr+'</span>':'')+'</div></div>'+'<button class="edit-btn" onclick="openThresholdModal(event,\''+id+'\',\''+eName+'\')">✏️</button>'+'<div class="card-amounts"><div class="card-amount '+cls+'">'+disp+'</div>'+(toOrder>0?'<div class="card-order">+$'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'</div>':'')+'</div></div>';}).join('');}
 function rank(t,th){if(t.amount===0)return 0;if(t.amount!==null&&t.amount<th)return 1;return 2;}
-
 loadSettings();fetchData();scheduleNextRefresh();
 </script>
 </body>
