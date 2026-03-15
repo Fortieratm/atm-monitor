@@ -32,7 +32,7 @@ def scrape_myterminals(user, pwd):
         browser = p.chromium.launch(headless=True, args=["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"])
         page = browser.new_page()
         try:
-            # Step 1: Login
+            # Login
             page.goto("https://secure.myterminals.com/SPS/login/login.aspx?ReturnUrl=%2FSPS%2Fdefault.aspx", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=15000)
             page.fill("input[type=text]", user)
@@ -41,42 +41,58 @@ def scrape_myterminals(user, pwd):
             page.wait_for_load_state("networkidle", timeout=15000)
             print(f"MT after login: {page.url}")
 
-            # Step 2: Go directly to Terminal Management
+            # Go directly to Terminal Management page
             page.goto("https://secure.myterminals.com/SPS/addins/TerminalManager/Views.aspx", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=15000)
             page.wait_for_timeout(3000)
-            print(f"MT terminal page: {page.url}")
+            print(f"MT terminal page loaded")
 
-            # Step 3: Parse the table
+            # Parse rows individually using TD elements
             rows = page.query_selector_all("table tr")
             print(f"MT rows: {len(rows)}")
 
-            if rows:
-                headers = [th.inner_text().strip().lower() for th in rows[0].query_selector_all("th,td")]
-                print(f"MT headers: {headers}")
-
-                # Find column indices
-                id_idx   = next((i for i,h in enumerate(headers) if "terminal id" in h), 0)
-                name_idx = next((i for i,h in enumerate(headers) if "location" in h), 1)
-                amount_idx = next((i for i,h in enumerate(headers) if "total cassette" in h or "cassette value" in h), None)
-
-                print(f"MT cols - id:{id_idx} name:{name_idx} amount:{amount_idx}")
-
-                for row in rows[1:]:
-                    cells = [td.inner_text().strip() for td in row.query_selector_all("td")]
-                    if not cells or len(cells) < 2: continue
-                    terminal_id = cells[id_idx] if id_idx < len(cells) else ""
-                    name = cells[name_idx] if name_idx < len(cells) else cells[0]
-                    amount = None
-                    if amount_idx is not None and amount_idx < len(cells):
-                        amount = find_amount(cells[amount_idx])
-                    if name:
-                        terminals.append({
-                            "source": "myterminals",
-                            "name": name,
-                            "terminal_id": terminal_id,
-                            "amount": amount
-                        })
+            headers = []
+            for i, row in enumerate(rows):
+                tds = row.query_selector_all("td")
+                cells = [td.inner_text().strip() for td in tds]
+                
+                # Skip empty rows
+                if not cells or all(c == "" for c in cells):
+                    continue
+                
+                # Header row
+                if i == 0 or (cells and "terminal id" in cells[0].lower()):
+                    headers = [c.lower() for c in cells]
+                    print(f"MT headers: {headers}")
+                    continue
+                
+                # Skip rows that are clearly not data
+                if len(cells) < 5:
+                    continue
+                
+                # Find indices dynamically
+                if not headers:
+                    continue
+                    
+                id_idx     = next((j for j,h in enumerate(headers) if "terminal id" in h), 0)
+                name_idx   = next((j for j,h in enumerate(headers) if "location" in h), 1)
+                amount_idx = next((j for j,h in enumerate(headers) if "total cassette" in h or ("cassette" in h and "value" in h)), None)
+                
+                terminal_id = cells[id_idx] if id_idx < len(cells) else ""
+                name = cells[name_idx] if name_idx < len(cells) else cells[0]
+                amount = None
+                
+                if amount_idx is not None and amount_idx < len(cells):
+                    amount = find_amount(cells[amount_idx])
+                
+                # Only add real terminal rows (Terminal IDs start with T or letters)
+                if terminal_id and len(terminal_id) > 3 and not " " in terminal_id and name:
+                    terminals.append({
+                        "source": "myterminals",
+                        "name": name,
+                        "terminal_id": terminal_id,
+                        "amount": amount
+                    })
 
             print(f"MT found: {len(terminals)}")
         except Exception as e:
@@ -94,12 +110,11 @@ def scrape_perativ(user, pwd):
             page.goto("https://webapps.perativ.com/Account/Login", timeout=30000)
             page.wait_for_load_state("networkidle", timeout=10000)
             page.wait_for_timeout(2000)
-            print(f"PV login page: {page.url}")
 
             for selector in ["input[name='UserName']","input[type='text']","#UserName"]:
                 try:
                     page.fill(selector, user, timeout=5000)
-                    print(f"PV username filled: {selector}")
+                    print(f"PV username filled")
                     break
                 except: continue
 
@@ -113,25 +128,26 @@ def scrape_perativ(user, pwd):
 
             page.wait_for_load_state("networkidle", timeout=15000)
             page.wait_for_timeout(3000)
-            print(f"PV after login: {page.url} | title: {page.title()}")
+            print(f"PV after login: {page.url}")
 
             rows = page.query_selector_all("table tr")
-            print(f"PV rows: {len(rows)}")
-
-            if rows:
-                headers = [th.inner_text().strip().lower() for th in rows[0].query_selector_all("th,td")]
-                print(f"PV headers: {headers}")
-                name_idx = next((i for i,h in enumerate(headers) if "location" in h or "name" in h), 0)
-                amount_idx = next((i for i,h in enumerate(headers) if "available" in h or "cash" in h or "balance" in h), None)
-                for row in rows[1:]:
-                    cells = [td.inner_text().strip() for td in row.query_selector_all("td")]
-                    if not cells or len(cells) < 2: continue
-                    name = cells[name_idx] if name_idx < len(cells) else cells[0]
-                    amount = None
-                    if amount_idx is not None and amount_idx < len(cells):
-                        amount = find_amount(cells[amount_idx])
-                    if name:
-                        terminals.append({"source":"perativ","name":name,"amount":amount})
+            headers = []
+            for i, row in enumerate(rows):
+                tds = row.query_selector_all("td,th")
+                cells = [td.inner_text().strip() for td in tds]
+                if not cells or all(c=="" for c in cells): continue
+                if i == 0 or any("location" in c.lower() or "name" in c.lower() for c in cells):
+                    headers = [c.lower() for c in cells]
+                    continue
+                if not headers or len(cells) < 2: continue
+                name_idx   = next((j for j,h in enumerate(headers) if "location" in h or "name" in h), 0)
+                amount_idx = next((j for j,h in enumerate(headers) if "available" in h or "cash" in h or "balance" in h), None)
+                name = cells[name_idx] if name_idx < len(cells) else cells[0]
+                amount = None
+                if amount_idx is not None and amount_idx < len(cells):
+                    amount = find_amount(cells[amount_idx])
+                if name:
+                    terminals.append({"source":"perativ","name":name,"amount":amount})
 
             print(f"PV found: {len(terminals)}")
         except Exception as e:
