@@ -12,6 +12,24 @@
 :root{--bg:#080c10;--card:#0f1520;--card2:#151d2a;--border:#1e2d40;--green:#00ff88;--yellow:#ffd000;--red:#ff2d55;--blue:#0af;--text:#e8f4ff;--muted:#4a6380;--r:14px;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;}
+
+/* LOGIN SCREEN */
+.login-screen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;padding:24px;}
+.login-screen.hidden{display:none;}
+.login-box{width:100%;max-width:380px;text-align:center;}
+.login-logo{height:60px;filter:invert(1);object-fit:contain;margin-bottom:32px;}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:var(--muted);margin-bottom:32px;}
+.login-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;color:var(--text);font-family:'Space Mono',monospace;font-size:18px;outline:none;text-align:center;letter-spacing:4px;margin-bottom:16px;transition:border-color 0.2s;}
+.login-input:focus{border-color:var(--green);}
+.login-input.error{border-color:var(--red);animation:shake 0.3s ease;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.login-btn{width:100%;padding:16px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--green),var(--blue));color:#000;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-bottom:16px;transition:opacity 0.2s;}
+.login-btn:active{opacity:0.8;}
+.faceid-btn{width:100%;padding:14px;border-radius:14px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Space Mono',monospace;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;}
+.faceid-btn:hover{border-color:var(--blue);color:var(--blue);}
+.faceid-btn.hidden{display:none;}
+.login-error{font-size:12px;color:var(--red);margin-top:8px;min-height:18px;}
+
 .header{position:sticky;top:0;z-index:50;background:rgba(8,12,16,0.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,12px) 24px 0;}
 .header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px;}
 .logo{height:36px;filter:invert(1);object-fit:contain;}
@@ -66,7 +84,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .fill-bar{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:12px;display:none;}
 .fill-bar.show{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 .fill-bar-info{font-size:12px;color:var(--text);}
-.fill-bar-info span{color:var(--green);font-weight:700;}
 .fill-bar-btns{display:flex;gap:8px;}
 .fill-export-btn{padding:8px 14px;border-radius:8px;border:none;background:var(--green);color:#000;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;}
 .fill-clear-btn{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;}
@@ -125,12 +142,28 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 </style>
 </head>
 <body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <img src="/Cyber_25.jpg" class="login-logo" alt="ATM CYBER 25 INC.">
+    <div class="login-title">ACCÈS SÉCURISÉ</div>
+    <input class="login-input" type="password" id="loginInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">CONNEXION</button>
+    <button class="faceid-btn hidden" id="faceIdBtn" onclick="doFaceId()">
+      <span>🔒</span> Face ID / Touch ID
+    </button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<div id="appContent" style="display:none">
 <div class="header">
   <div class="header-inner">
     <img src="/Cyber_25.jpg" class="logo" alt="ATM CYBER 25 INC.">
     <div class="header-right">
       <div class="sync-time" id="syncTime">Chargement...</div>
-      <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()" title="Rafraîchir">↻</button>
+      <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()">↻</button>
     </div>
   </div>
   <div class="tabs">
@@ -196,6 +229,9 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
   <button class="nav-btn active" id="navDash" onclick="mobileView('dash')"><span class="nav-icon">📊</span>Dashboard</button>
   <button class="nav-btn" id="navSet" onclick="mobileView('set')"><span class="nav-icon">⚙️</span>Réglages</button>
 </div>
+</div>
+
+<!-- THRESHOLD MODAL -->
 <div class="modal-overlay" id="thresholdModal">
   <div class="modal">
     <div class="modal-title">Seuil d'alerte</div>
@@ -208,6 +244,8 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
     <div class="modal-reset" onclick="resetThreshold()">Utiliser le seuil global</div>
   </div>
 </div>
+
+<!-- EXPORT MODAL -->
 <div class="modal-overlay" id="exportModal">
   <div class="modal">
     <div class="modal-title">📋 Liste de remplissage</div>
@@ -221,38 +259,131 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
     </div>
   </div>
 </div>
+
 <script>
 const SERVER='https://atm-monitor-production.up.railway.app';
-const BASE_LAT=45.1253;
-const BASE_LNG=-72.6089;
+const APP_PASSWORD='Cyber25911!';
+const BASE_LAT=45.1253,BASE_LNG=-72.6089;
 let terminals=[],activeFilter='all';
 let autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null;
 let currentModalId=null,selectedIds=new Set();
+
+// ── LOGIN ──────────────────────────────────────────────────────────────
+function checkAuth(){
+  const t=sessionStorage.getItem('atm_auth');
+  if(t&&Date.now()-parseInt(t)<8*60*60*1000){
+    showApp();
+  } else {
+    document.getElementById('loginScreen').classList.remove('hidden');
+    // Check if biometrics available
+    if(window.PublicKeyCredential&&localStorage.getItem('atm_cred_id')){
+      document.getElementById('faceIdBtn').classList.remove('hidden');
+      setTimeout(doFaceId, 500);
+    }
+  }
+}
+
+function doLogin(){
+  const pwd=document.getElementById('loginInput').value;
+  if(pwd===APP_PASSWORD){
+    sessionStorage.setItem('atm_auth',Date.now().toString());
+    document.getElementById('loginError').textContent='';
+    showApp();
+    // Offer to save biometrics
+    if(window.PublicKeyCredential&&!localStorage.getItem('atm_cred_id')){
+      setTimeout(registerBiometrics,1000);
+    }
+  } else {
+    const input=document.getElementById('loginInput');
+    input.classList.add('error');
+    document.getElementById('loginError').textContent='Mot de passe incorrect';
+    setTimeout(()=>input.classList.remove('error'),500);
+    input.value='';
+  }
+}
+
+function showApp(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appContent').style.display='block';
+  loadSettings();
+  fetchData();
+  scheduleNextRefresh();
+}
+
+async function registerBiometrics(){
+  try{
+    const cred=await navigator.credentials.create({
+      publicKey:{
+        challenge:crypto.getRandomValues(new Uint8Array(32)),
+        rp:{name:'ATM CYBER 25',id:location.hostname},
+        user:{id:new Uint8Array(16),name:'user',displayName:'ATM User'},
+        pubKeyCredParams:[{alg:-7,type:'public-key'},{alg:-257,type:'public-key'}],
+        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
+        timeout:60000
+      }
+    });
+    localStorage.setItem('atm_cred_id',btoa(String.fromCharCode(...new Uint8Array(cred.rawId))));
+    document.getElementById('faceIdBtn').classList.remove('hidden');
+  }catch(e){console.log('Biometrics not available');}
+}
+
+async function doFaceId(){
+  try{
+    const credId=localStorage.getItem('atm_cred_id');
+    if(!credId)return;
+    const rawId=Uint8Array.from(atob(credId),c=>c.charCodeAt(0));
+    await navigator.credentials.get({
+      publicKey:{
+        challenge:crypto.getRandomValues(new Uint8Array(32)),
+        allowCredentials:[{id:rawId,type:'public-key'}],
+        userVerification:'required',
+        timeout:60000
+      }
+    });
+    sessionStorage.setItem('atm_auth',Date.now().toString());
+    showApp();
+  }catch(e){
+    document.getElementById('loginError').textContent='Face ID échoué — entrez le mot de passe';
+  }
+}
+
+// ── DISTANCES ──────────────────────────────────────────────────────────
 const CITY_COORDS={'sherbrooke':{lat:45.4042,lng:-71.8929},'sutton':{lat:45.1253,lng:-72.6089},'brome':{lat:45.1800,lng:-72.5200},'magog':{lat:45.2667,lng:-72.1500},'granby':{lat:45.4000,lng:-72.7333},'windsor':{lat:45.5667,lng:-71.9833},'waterville':{lat:45.2667,lng:-71.9000},'coaticook':{lat:45.1333,lng:-71.8000},'cowansville':{lat:45.2000,lng:-72.7500},'lac-megantic':{lat:45.5833,lng:-70.8833},'ascot corner':{lat:45.4833,lng:-71.7000},'east angus':{lat:45.4833,lng:-71.6667}};
-function getCoords(t){const city=(t.city||'').toLowerCase().trim();if(CITY_COORDS[city])return CITY_COORDS[city];for(const[k,v]of Object.entries(CITY_COORDS)){if(city.includes(k)||k.includes(city))return v;}return null;}
+function getCoords(t){const c=(t.city||'').toLowerCase().trim();if(CITY_COORDS[c])return CITY_COORDS[c];for(const[k,v]of Object.entries(CITY_COORDS)){if(c.includes(k)||k.includes(c))return v;}return null;}
 function distanceKm(la1,lo1,la2,lo2){const R=6371,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180,a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 function getDistance(t){const c=getCoords(t);if(!c)return 9999;return distanceKm(BASE_LAT,BASE_LNG,c.lat,c.lng);}
+
+// ── THRESHOLDS ─────────────────────────────────────────────────────────
 function getThresholds(){try{return JSON.parse(localStorage.getItem('atm_thresholds')||'{}');}catch(e){return{};}}
 function setThresholdForTerminal(id,v){const t=getThresholds();if(v===null)delete t[id];else t[id]=v;localStorage.setItem('atm_thresholds',JSON.stringify(t));}
 function getThresholdForTerminal(id){const t=getThresholds();const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');return t[id]!==undefined?t[id]:(s.threshold||500);}
+
 function openThresholdModal(e,id,name){e.stopPropagation();currentModalId=id;const t=getThresholds();const g=JSON.parse(localStorage.getItem('atm_cfg')||'{}').threshold||500;document.getElementById('modalName').textContent=name;document.getElementById('modalInput').value=t[id]!==undefined?t[id]:'';document.getElementById('modalInput').placeholder='Seuil global: $'+g;document.getElementById('thresholdModal').classList.add('show');setTimeout(()=>document.getElementById('modalInput').focus(),100);}
 function closeThresholdModal(){document.getElementById('thresholdModal').classList.remove('show');currentModalId=null;}
 function saveThreshold(){const v=parseInt(document.getElementById('modalInput').value);if(!isNaN(v)&&v>=0){setThresholdForTerminal(currentModalId,v);closeThresholdModal();renderList();renderStats();renderOrderBanner();}}
 function resetThreshold(){setThresholdForTerminal(currentModalId,null);closeThresholdModal();renderList();renderStats();renderOrderBanner();}
 document.getElementById('thresholdModal').addEventListener('click',function(e){if(e.target===this)closeThresholdModal();});
+
+// ── SELECTION ──────────────────────────────────────────────────────────
 function toggleSelect(id){if(selectedIds.has(id))selectedIds.delete(id);else selectedIds.add(id);renderList();updateFillBar();}
 function updateFillBar(){const bar=document.getElementById('fillBar');if(selectedIds.size===0){bar.classList.remove('show');return;}bar.classList.add('show');let total=0;selectedIds.forEach(id=>{const t=terminals.find(t=>(t.terminal_id||t.name)===id);if(t){const th=getThresholdForTerminal(id);const amt=t.amount||0;if(amt<th)total+=(th-amt);}});document.getElementById('fillCount').textContent=selectedIds.size;document.getElementById('fillTotal').textContent='$'+total.toLocaleString('fr-CA',{maximumFractionDigits:0});}
 function clearSelection(){selectedIds.clear();renderList();updateFillBar();}
-function showExport(){const selected=terminals.filter(t=>selectedIds.has(t.terminal_id||t.name)).map(t=>({...t,distance:getDistance(t)})).sort((a,b)=>a.distance-b.distance);const now=new Date();let text='🏧 ATM CYBER 25 INC.\n';text+='Liste de remplissage\n';text+=now.toLocaleDateString('fr-CA')+' '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})+'\n';text+='━━━━━━━━━━━━━━━━━━━━\n\n';let totalOrder=0;selected.forEach((t,i)=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount||0;const toOrder=Math.max(0,th-amt);totalOrder+=toOrder;const dist=t.distance<9999?' (~'+t.distance.toFixed(0)+'km)':'';text+=(i+1)+'. '+t.name+dist+'\n';if(t.city)text+='   📍 '+t.city+'\n';text+='   💵 En caisse: $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';text+='   📦 À mettre: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n\n';});text+='━━━━━━━━━━━━━━━━━━━━\n';text+='💰 TOTAL: $'+totalOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';text+=selected.length+' guichet'+(selected.length>1?'s':'')+' à remplir';document.getElementById('exportText').textContent=text;document.getElementById('exportModal').classList.add('show');}
+
+// ── EXPORT ─────────────────────────────────────────────────────────────
+function showExport(){const selected=terminals.filter(t=>selectedIds.has(t.terminal_id||t.name)).map(t=>({...t,distance:getDistance(t)})).sort((a,b)=>a.distance-b.distance);const now=new Date();let text='🏧 ATM CYBER 25 INC.\nListe de remplissage\n'+now.toLocaleDateString('fr-CA')+' '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})+'\n━━━━━━━━━━━━━━━━━━━━\n\n';let totalOrder=0;selected.forEach((t,i)=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount||0;const toOrder=Math.max(0,th-amt);totalOrder+=toOrder;const dist=t.distance<9999?' (~'+t.distance.toFixed(0)+'km)':'';text+=(i+1)+'. '+t.name+dist+'\n';if(t.city)text+='   📍 '+t.city+'\n';text+='   💵 En caisse: $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n   📦 À mettre: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n\n';});text+='━━━━━━━━━━━━━━━━━━━━\n💰 TOTAL: $'+totalOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n'+selected.length+' guichet'+(selected.length>1?'s':'')+' à remplir';document.getElementById('exportText').textContent=text;document.getElementById('exportModal').classList.add('show');}
 function closeExportModal(){document.getElementById('exportModal').classList.remove('show');}
 document.getElementById('exportModal').addEventListener('click',function(e){if(e.target===this)closeExportModal();});
 function copyList(){const text=document.getElementById('exportText').textContent;navigator.clipboard.writeText(text).then(()=>{const btn=document.querySelector('.btn-copy');btn.textContent='✅ Copié!';setTimeout(()=>{btn.textContent='📋 Copier';},2000);});}
 function sendSMS(){window.open('sms:?body='+encodeURIComponent(document.getElementById('exportText').textContent));}
 function sendEmail(){window.open('mailto:?subject='+encodeURIComponent('ATM CYBER 25 - Liste de remplissage')+'&body='+encodeURIComponent(document.getElementById('exportText').textContent));}
+
+// ── SETTINGS ───────────────────────────────────────────────────────────
 function loadSettings(){try{const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');if(s.mtUser)document.getElementById('mtUser').value=s.mtUser;if(s.mtPass)document.getElementById('mtPass').value=s.mtPass;if(s.pvUser)document.getElementById('pvUser').value=s.pvUser;if(s.pvPass)document.getElementById('pvPass').value=s.pvPass;if(s.threshold!==undefined)document.getElementById('threshold').value=s.threshold;return s;}catch(e){return{};}}
 function saveSettings(){const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};localStorage.setItem('atm_cfg',JSON.stringify(s));fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);mobileView('dash');setTimeout(fetchData,2000);}
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderList();}
 function mobileView(v){['settingsPanel','perativPanel','alertPanel'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('mobile-show',v==='set');});document.getElementById('navDash').classList.toggle('active',v==='dash');document.getElementById('navSet').classList.toggle('active',v==='set');const tl=document.getElementById('termList');const sw=document.querySelector('.search-wrap');if(tl)tl.style.display=v==='dash'?'':'none';if(sw)sw.style.display=v==='dash'?'':'none';}
+
+// ── DATA ───────────────────────────────────────────────────────────────
 async function fetchData(){try{const res=await fetch(SERVER+'/api/data');const data=await res.json();terminals=data.terminals||[];const now=new Date();document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});renderList();renderStats();renderAlerts();renderOrderBanner();updateFillBar();}catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}}
 async function doRefresh(){const btn=document.getElementById('refreshBtn');btn.classList.add('spinning');setLoading();try{await fetch(SERVER+'/api/refresh',{method:'POST'});await new Promise(r=>setTimeout(r,8000));await fetchData();}catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}btn.classList.remove('spinning');scheduleNextRefresh();}
 function scheduleNextRefresh(){if(autoRefreshTimer)clearTimeout(autoRefreshTimer);if(countdownTimer)clearInterval(countdownTimer);const INTERVAL=5*60*1000;nextRefreshTime=Date.now()+INTERVAL;autoRefreshTimer=setTimeout(()=>doRefresh(),INTERVAL);countdownTimer=setInterval(()=>{const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));const min=Math.floor(remaining/60);const sec=remaining%60;document.getElementById('nextRefresh').textContent='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');if(remaining===0)clearInterval(countdownTimer);},1000);}
@@ -262,7 +393,8 @@ function renderOrderBanner(){let totalToOrder=0,count=0;terminals.forEach(t=>{co
 function renderAlerts(){const alerts=[];terminals.forEach(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;if(amt!==null&&amt!==undefined){if(amt===0)alerts.push({msg:'🚨 VIDE: '+t.name+' — Commander $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0})});else if(amt<th)alerts.push({msg:'⚠️ BAS: '+t.name+' — $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+' (commander $'+(th-amt).toLocaleString('fr-CA',{maximumFractionDigits:0})+')'});}});const b=document.getElementById('alertBanner');if(!alerts.length){b.classList.remove('show');return;}b.classList.add('show');document.getElementById('alertItems').innerHTML=alerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');}
 function renderList(){const q=document.getElementById('searchBox').value.toLowerCase();let list=terminals;if(activeFilter!=='all')list=list.filter(t=>t.source===activeFilter);if(q)list=list.filter(t=>(t.name||'').toLowerCase().includes(q));if(!list.length&&!terminals.length){document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">⚙️</div><div class="state-text">Configure tes accès dans <strong>Réglages</strong></div></div>';return;}if(!list.length){document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">🔍</div><div class="state-text">Aucun résultat</div></div>';return;}list=[...list].sort((a,b)=>rank(a,getThresholdForTerminal(a.terminal_id||a.name))-rank(b,getThresholdForTerminal(b.terminal_id||b.name)));const thresholds=getThresholds();document.getElementById('termList').innerHTML=list.map(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;let st,cls,disp;if(amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}else if(amt===0){st='empty';cls='empty';disp='$0';}else if(amt<th){st='low';cls='low';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}else{st='ok';cls='ok';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}const src=t.source==='myterminals'?'MyTerminals':'Perativ';const customTh=thresholds[id]!==undefined;const thLabel=(customTh?'⚡':'')+'Seuil: $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0});const toOrder=(amt!==null&&amt<th)?(th-amt):0;const toOrderStr=toOrder>0?'Commander: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0}):'';const isSelected=selectedIds.has(id);const eName=t.name.replace(/'/g,"\\'");return'<div class="card '+st+(isSelected?' selected':'')+'" onclick="toggleSelect(\''+id+'\')">'+'<div class="card-check">'+(isSelected?'✓':'')+'</div>'+'<div class="card-info"><div class="card-name">'+t.name+'</div><div class="card-source">'+src+(t.city?' · '+t.city:'')+'</div><div class="card-meta"><span>'+thLabel+'</span>'+(toOrderStr?'<span class="to-order">'+toOrderStr+'</span>':'')+'</div></div>'+'<button class="edit-btn" onclick="openThresholdModal(event,\''+id+'\',\''+eName+'\')">✏️</button>'+'<div class="card-amounts"><div class="card-amount '+cls+'">'+disp+'</div>'+(toOrder>0?'<div class="card-order">+$'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'</div>':'')+'</div></div>';}).join('');}
 function rank(t,th){if(t.amount===0)return 0;if(t.amount!==null&&t.amount<th)return 1;return 2;}
-loadSettings();fetchData();scheduleNextRefresh();
+
+checkAuth();
 </script>
 </body>
 </html>
