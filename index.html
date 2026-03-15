@@ -28,16 +28,22 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .tab.active{background:var(--card2);border-color:var(--green);color:var(--green);}
 .main-layout{display:flex;gap:24px;padding:20px 24px;padding-bottom:40px;max-width:1600px;margin:0 auto;}
 @media(max-width:768px){.main-layout{flex-direction:column;padding:12px 16px;padding-bottom:calc(80px + env(safe-area-inset-bottom));}}
-.left-panel{flex:0 0 300px;}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.left-panel{flex:0 0 320px;}
+
+/* STATS - 2x2 grid */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
 .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 10px;text-align:center;position:relative;overflow:hidden;}
 .stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
-.stat.s-total::after{background:var(--blue);}.stat.s-low::after{background:var(--yellow);}.stat.s-empty::after{background:var(--red);}
-.stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;}
-.c-blue{color:var(--blue);}.c-yellow{color:var(--yellow);}.c-red{color:var(--red);}.c-orange{color:#ff8800;}
+.stat.s-total::after{background:var(--blue);}
+.stat.s-cash::after{background:var(--green);}
+.stat.s-low::after{background:var(--yellow);}
+.stat.s-empty::after{background:var(--red);}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;}
+.stat-num.small{font-size:20px;}
+.c-blue{color:var(--blue);}.c-yellow{color:var(--yellow);}.c-red{color:var(--red);}.c-green{color:var(--green);}.c-orange{color:#ff8800;}
 .stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
 
-/* TOTAL TO ORDER BANNER */
+/* ORDER BANNER */
 .order-banner{background:linear-gradient(135deg,rgba(255,136,0,0.15),rgba(255,45,85,0.1));border:1px solid rgba(255,136,0,0.4);border-radius:var(--r);padding:16px 18px;margin-bottom:16px;}
 .order-banner-title{font-size:10px;color:#ff8800;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
 .order-banner-amount{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#ff8800;line-height:1;}
@@ -62,8 +68,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .search-input::placeholder{color:var(--muted);}
 .next-refresh{font-size:10px;color:var(--muted);text-align:center;padding:4px 0 8px;}
 .right-panel{flex:1;min-width:0;}
-
-/* TERMINAL CARDS */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;position:relative;overflow:hidden;transition:all 0.15s;}
 .card:hover{border-color:var(--muted);}
 .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
@@ -75,17 +79,12 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .card-meta{font-size:10px;color:var(--muted);margin-top:3px;}
 .card-meta span{margin-right:12px;}
 .card-meta .to-order{color:#ff8800;}
-
-/* AMOUNTS SECTION */
 .card-amounts{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
 .card-amount{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;line-height:1;}
 .card-amount.ok{color:var(--green);}.card-amount.low{color:var(--yellow);}.card-amount.empty{color:var(--red);}.card-amount.na{color:var(--muted);font-size:14px;font-family:'Space Mono',monospace;}
 .card-order{font-size:11px;color:#ff8800;text-align:right;}
-
 .edit-btn{background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:5px 10px;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;transition:all 0.15s;flex-shrink:0;}
 .edit-btn:hover{border-color:var(--green);color:var(--green);}
-
-/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.show{display:flex;}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:380px;}
@@ -129,8 +128,10 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 </div>
 <div class="main-layout">
   <div class="left-panel">
+    <!-- 4 STATS -->
     <div class="stats">
-      <div class="stat s-total"><div class="stat-num c-blue" id="sTotal">—</div><div class="stat-lbl">Total</div></div>
+      <div class="stat s-total"><div class="stat-num c-blue" id="sTotal">—</div><div class="stat-lbl">Guichets</div></div>
+      <div class="stat s-cash"><div class="stat-num c-green small" id="sCash">—</div><div class="stat-lbl">En caisse</div></div>
       <div class="stat s-low"><div class="stat-num c-yellow" id="sLow">—</div><div class="stat-lbl">Bas</div></div>
       <div class="stat s-empty"><div class="stat-num c-red" id="sEmpty">—</div><div class="stat-lbl">Vides</div></div>
     </div>
@@ -210,8 +211,8 @@ function openModal(id,name){
   setTimeout(()=>document.getElementById('modalInput').focus(),100);
 }
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');currentModalId=null;}
-function saveThreshold(){const val=parseInt(document.getElementById('modalInput').value);if(!isNaN(val)&&val>=0){setThresholdForTerminal(currentModalId,val);closeModal();renderList();renderOrderBanner();}}
-function resetThreshold(){setThresholdForTerminal(currentModalId,null);closeModal();renderList();renderOrderBanner();}
+function saveThreshold(){const val=parseInt(document.getElementById('modalInput').value);if(!isNaN(val)&&val>=0){setThresholdForTerminal(currentModalId,val);closeModal();renderList();renderStats();renderOrderBanner();}}
+function resetThreshold(){setThresholdForTerminal(currentModalId,null);closeModal();renderList();renderStats();renderOrderBanner();}
 document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
 function loadSettings(){
@@ -230,8 +231,7 @@ function saveSettings(){
   const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};
   localStorage.setItem('atm_cfg',JSON.stringify(s));
   fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);
-  mobileView('dash');
-  setTimeout(fetchData,2000);
+  mobileView('dash');setTimeout(fetchData,2000);
 }
 
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderList();}
@@ -284,54 +284,54 @@ function scheduleNextRefresh(){
 function setLoading(){document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="state-text">Connexion aux guichets...</div></div>';}
 
 function renderStats(){
-  const t=terminals;let low=0,empty=0;
-  t.forEach(terminal=>{
-    const th=getThresholdForTerminal(terminal.terminal_id||terminal.name);
-    const amt=terminal.amount;
-    if(amt===0)empty++;
-    else if(amt!==null&&amt<th)low++;
+  let low=0,empty=0,totalCash=0,count=0;
+  terminals.forEach(t=>{
+    const th=getThresholdForTerminal(t.terminal_id||t.name);
+    const amt=t.amount;
+    if(amt!==null&&amt!==undefined){
+      totalCash+=amt;
+      count++;
+      if(amt===0)empty++;
+      else if(amt<th)low++;
+    }
   });
-  document.getElementById('sTotal').textContent=t.length||'—';
-  document.getElementById('sLow').textContent=t.length?low:'—';
-  document.getElementById('sEmpty').textContent=t.length?empty:'—';
+  document.getElementById('sTotal').textContent=terminals.length||'—';
+  document.getElementById('sCash').textContent=count>0?'$'+totalCash.toLocaleString('fr-CA',{maximumFractionDigits:0}):'—';
+  document.getElementById('sLow').textContent=terminals.length?low:'—';
+  document.getElementById('sEmpty').textContent=terminals.length?empty:'—';
 }
 
 function renderOrderBanner(){
-  let totalToOrder=0;let count=0;
+  let totalToOrder=0,count=0;
   terminals.forEach(t=>{
     const id=t.terminal_id||t.name;
     const th=getThresholdForTerminal(id);
     const amt=t.amount;
-    if(amt!==null&&amt<th){
-      totalToOrder+=(th-amt);
-      count++;
-    }
+    if(amt!==null&&amt<th){totalToOrder+=(th-amt);count++;}
   });
   const banner=document.getElementById('orderBanner');
   if(totalToOrder>0){
     banner.style.display='block';
     document.getElementById('orderTotal').textContent='$'+totalToOrder.toLocaleString('fr-CA',{maximumFractionDigits:0});
     document.getElementById('orderCount').textContent=count+' guichet'+(count>1?'s':'')+' à remplir';
-  } else {
-    banner.style.display='none';
-  }
+  }else{banner.style.display='none';}
 }
 
 function renderAlerts(){
-  const customAlerts=[];
+  const alerts=[];
   terminals.forEach(t=>{
     const id=t.terminal_id||t.name;
     const th=getThresholdForTerminal(id);
     const amt=t.amount;
     if(amt!==null&&amt!==undefined){
-      if(amt===0)customAlerts.push({msg:'🚨 VIDE: '+t.name+' — Commander $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0})});
-      else if(amt<th)customAlerts.push({msg:'⚠️ BAS: '+t.name+' — $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+' (commander $'+(th-amt).toLocaleString('fr-CA',{maximumFractionDigits:0})+')'});
+      if(amt===0)alerts.push({msg:'🚨 VIDE: '+t.name+' — Commander $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0})});
+      else if(amt<th)alerts.push({msg:'⚠️ BAS: '+t.name+' — $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+' (commander $'+(th-amt).toLocaleString('fr-CA',{maximumFractionDigits:0})+')'});
     }
   });
   const b=document.getElementById('alertBanner');
-  if(!customAlerts.length){b.classList.remove('show');return;}
+  if(!alerts.length){b.classList.remove('show');return;}
   b.classList.add('show');
-  document.getElementById('alertItems').innerHTML=customAlerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');
+  document.getElementById('alertItems').innerHTML=alerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');
 }
 
 function renderList(){
@@ -347,11 +347,7 @@ function renderList(){
     document.getElementById('termList').innerHTML='<div class="state-box"><div class="state-icon">🔍</div><div class="state-text">Aucun résultat</div></div>';
     return;
   }
-  list=[...list].sort((a,b)=>{
-    const thA=getThresholdForTerminal(a.terminal_id||a.name);
-    const thB=getThresholdForTerminal(b.terminal_id||b.name);
-    return rank(a,thA)-rank(b,thB);
-  });
+  list=[...list].sort((a,b)=>rank(a,getThresholdForTerminal(a.terminal_id||a.name))-rank(b,getThresholdForTerminal(b.terminal_id||b.name)));
   const thresholds=getThresholds();
   document.getElementById('termList').innerHTML=list.map(t=>{
     const id=t.terminal_id||t.name;
@@ -371,21 +367,4 @@ function renderList(){
     return '<div class="card '+st+'">'
       +'<div class="card-info">'
         +'<div class="card-name">'+t.name+'</div>'
-        +'<div class="card-source">'+src+'</div>'
-        +'<div class="card-meta"><span>'+thLabel+'</span>'+(toOrderStr?'<span class="to-order">'+toOrderStr+'</span>':'')+'</div>'
-      +'</div>'
-      +'<button class="edit-btn" onclick="openModal(\''+id+'\',\''+eName+'\')">✏️ Seuil</button>'
-      +'<div class="card-amounts">'
-        +'<div class="card-amount '+cls+'">'+disp+'</div>'
-        +(toOrder>0?'<div class="card-order">+$'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'</div>':'')
-      +'</div>'
-    +'</div>';
-  }).join('');
-}
-
-function rank(t,th){if(t.amount===0)return 0;if(t.amount!==null&&t.amount<th)return 1;return 2;}
-
-loadSettings();fetchData();scheduleNextRefresh();
-</script>
-</body>
-</html>
+        +'<div class="card-s
