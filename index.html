@@ -15,7 +15,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .login-screen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;padding:24px;}
 .login-screen.hidden{display:none;}
 .login-box{width:100%;max-width:380px;text-align:center;}
-.login-logo{height:60px;filter:invert(1);object-fit:contain;margin-bottom:32px;}
+.login-logo{height:60px;object-fit:contain;margin-bottom:32px;filter:invert(1);}
 .login-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:var(--muted);margin-bottom:32px;}
 .login-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;color:var(--text);font-family:'Space Mono',monospace;font-size:18px;outline:none;text-align:center;letter-spacing:4px;margin-bottom:16px;transition:border-color 0.2s;}
 .login-input:focus{border-color:var(--green);}
@@ -29,7 +29,8 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .login-error{font-size:12px;color:var(--red);margin-top:8px;min-height:18px;}
 .header{position:sticky;top:0;z-index:50;background:rgba(8,12,16,0.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,12px) 24px 0;}
 .header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px;}
-.logo{height:36px;filter:invert(1);object-fit:contain;}
+.logo{height:36px;object-fit:contain;filter:invert(1);}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .header-right{display:flex;align-items:center;gap:12px;}
 .sync-time{font-size:11px;color:var(--muted);text-align:right;line-height:1.4;}
 .refresh-btn{width:40px;height:40px;border-radius:12px;background:var(--card2);border:1px solid var(--border);color:var(--green);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
@@ -47,10 +48,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
 .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 10px;text-align:center;position:relative;overflow:hidden;}
 .stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
-.stat.s-total::after{background:var(--blue);}
-.stat.s-cash::after{background:var(--green);}
-.stat.s-low::after{background:var(--yellow);}
-.stat.s-empty::after{background:var(--red);}
+.stat.s-total::after{background:var(--blue);}.stat.s-cash::after{background:var(--green);}.stat.s-low::after{background:var(--yellow);}.stat.s-empty::after{background:var(--red);}
 .stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;}
 .stat-num.small{font-size:18px;}
 .c-blue{color:var(--blue);}.c-yellow{color:var(--yellow);}.c-red{color:var(--red);}.c-green{color:var(--green);}.c-orange{color:#ff8800;}
@@ -107,7 +105,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .edit-btn:hover{border-color:var(--green);color:var(--green);}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.show{display:flex;}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;}
 .modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--blue);margin-bottom:6px;}
 .modal-name{font-size:13px;color:var(--muted);margin-bottom:20px;}
 .modal-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--text);font-family:'Space Mono',monospace;font-size:18px;outline:none;text-align:center;margin-bottom:16px;}
@@ -116,9 +114,11 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .modal-save{flex:1;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--green),var(--blue));color:#000;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;}
 .modal-cancel{flex:1;padding:13px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;}
 .modal-reset{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;cursor:pointer;text-decoration:underline;}
-.export-list{background:var(--card2);border-radius:10px;padding:16px;margin-bottom:16px;font-size:12px;line-height:2;white-space:pre-wrap;word-break:break-all;}
+.export-list{background:var(--card2);border-radius:10px;padding:16px;margin-bottom:12px;font-size:12px;line-height:2;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;}
+.maps-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.maps-btn:active{opacity:0.85;}
 .export-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.export-action-btn{flex:1;padding:12px;border-radius:10px;border:none;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;min-width:120px;}
+.export-action-btn{flex:1;padding:12px;border-radius:10px;border:none;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;min-width:100px;}
 .btn-copy{background:var(--blue);color:#000;}
 .btn-sms{background:var(--green);color:#000;}
 .btn-email{background:var(--yellow);color:#000;}
@@ -143,7 +143,8 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 <!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
-    <img src="/Cyber_25.jpg" class="login-logo" alt="ATM CYBER 25 INC.">
+    <img src="/Cyber_25.jpg" class="login-logo" alt="ATM CYBER 25" onerror="this.style.display='none';document.getElementById('loginLogoText').style.display='block'">
+    <div id="loginLogoText" style="display:none;font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;background:linear-gradient(90deg,#00ff88,#0af);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:32px;">ATM CYBER 25 INC.</div>
     <div class="login-title">ACCÈS SÉCURISÉ</div>
     <input class="login-input" type="password" id="loginInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">CONNEXION</button>
@@ -155,7 +156,8 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 <div id="appContent" style="display:none">
 <div class="header">
   <div class="header-inner">
-    <img src="/Cyber_25.jpg" class="logo" alt="ATM CYBER 25 INC.">
+    <img src="/Cyber_25.jpg" class="logo" alt="ATM CYBER 25" onerror="this.style.display='none';document.getElementById('headerLogoText').style.display='block'">
+    <div id="headerLogoText" class="logo-text" style="display:none">ATM CYBER 25 INC.</div>
     <div class="header-right">
       <div class="sync-time" id="syncTime">Chargement...</div>
       <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()">↻</button>
@@ -242,7 +244,8 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 <div class="modal-overlay" id="exportModal">
   <div class="modal">
     <div class="modal-title">📋 Liste de remplissage</div>
-    <div class="modal-name">Triée par distance depuis Sutton</div>
+    <div class="modal-name" id="exportSubtitle"></div>
+    <button class="maps-btn" id="mapsBtn" onclick="openGoogleMaps()">🗺️ Ouvrir dans Google Maps</button>
     <div class="export-list" id="exportText"></div>
     <div class="export-actions">
       <button class="export-action-btn btn-copy" onclick="copyList()">📋 Copier</button>
@@ -257,16 +260,68 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 const SERVER='https://atm-monitor-production.up.railway.app';
 const APP_PASSWORD='Cyber25911!';
 const BASE_LAT=45.1253,BASE_LNG=-72.6089;
+const ORIGIN_ADDRESS='161 rue Principale Sud, Sutton, Quebec';
 let terminals=[],activeFilter='all';
 let autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null;
 let currentModalId=null,selectedIds=new Set();
+let mapsUrl='';
+
+// CITY COORDINATES
+const CITY_COORDS={
+  'sherbrooke':{lat:45.4042,lng:-71.8929},
+  'sutton':{lat:45.1253,lng:-72.6089},
+  'brome':{lat:45.1800,lng:-72.5200},
+  'magog':{lat:45.2667,lng:-72.1500},
+  'granby':{lat:45.4000,lng:-72.7333},
+  'windsor':{lat:45.5667,lng:-71.9833},
+  'waterville':{lat:45.2667,lng:-71.9000},
+  'coaticook':{lat:45.1333,lng:-71.8000},
+  'cowansville':{lat:45.2000,lng:-72.7500},
+  'lac-megantic':{lat:45.5833,lng:-70.8833},
+  'ascot corner':{lat:45.4833,lng:-71.7000},
+  'east angus':{lat:45.4833,lng:-71.6667}
+};
+
+function getCoords(t){
+  const c=(t.city||'').toLowerCase().trim();
+  if(CITY_COORDS[c])return CITY_COORDS[c];
+  for(const[k,v]of Object.entries(CITY_COORDS)){if(c.includes(k)||k.includes(c))return v;}
+  return null;
+}
+function distanceKm(la1,lo1,la2,lo2){
+  const R=6371,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180;
+  const a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function getDistance(t){const c=getCoords(t);if(!c)return 9999;return distanceKm(BASE_LAT,BASE_LNG,c.lat,c.lng);}
+
+// Build Google Maps URL with waypoints
+function buildMapsUrl(sorted){
+  const origin=encodeURIComponent(ORIGIN_ADDRESS);
+  // Max 25 waypoints in Google Maps URL
+  const waypoints=sorted.slice(0,-1).map(t=>{
+    const addr=t.city?encodeURIComponent(t.name+', '+t.city+', Quebec'):encodeURIComponent(t.name+', Quebec');
+    return addr;
+  });
+  const destination=sorted.length>0?encodeURIComponent(sorted[sorted.length-1].name+', '+(sorted[sorted.length-1].city||'Quebec')+', Quebec'):origin;
+  let url='https://www.google.com/maps/dir/?api=1';
+  url+='&origin='+origin;
+  url+='&destination='+destination;
+  if(waypoints.length>0)url+='&waypoints='+waypoints.join('|');
+  url+='&travelmode=driving&optimize=true';
+  return url;
+}
+
+function openGoogleMaps(){
+  if(mapsUrl)window.open(mapsUrl,'_blank');
+}
 
 // LOGIN
 function checkAuth(){
   const t=sessionStorage.getItem('atm_auth');
   if(t&&Date.now()-parseInt(t)<8*60*60*1000){
     showApp();
-  } else {
+  }else{
     document.getElementById('loginScreen').classList.remove('hidden');
     if(window.PublicKeyCredential&&localStorage.getItem('atm_cred_id')){
       document.getElementById('faceIdBtn').classList.remove('hidden');
@@ -274,15 +329,14 @@ function checkAuth(){
     }
   }
 }
+
 function doLogin(){
   const pwd=document.getElementById('loginInput').value;
   if(pwd===APP_PASSWORD){
     sessionStorage.setItem('atm_auth',Date.now().toString());
     showApp();
-    if(window.PublicKeyCredential&&!localStorage.getItem('atm_cred_id')){
-      setTimeout(registerBiometrics,1000);
-    }
-  } else {
+    if(window.PublicKeyCredential&&!localStorage.getItem('atm_cred_id'))setTimeout(registerBiometrics,1000);
+  }else{
     const input=document.getElementById('loginInput');
     input.classList.add('error');
     document.getElementById('loginError').textContent='Mot de passe incorrect';
@@ -290,22 +344,29 @@ function doLogin(){
     input.value='';
   }
 }
+
 function showApp(){
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appContent').style.display='block';
-  // Auto-send credentials to server on first load
-  fetch(SERVER+'/api/credentials',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      myterminals:{username:'MAFLeeP',password:'Atm_6085!'},
-      perativ:{username:'MARC-ANTOINE',password:'ePQb4PadBMrSKYu!'},
-      threshold:500
-    })
-  }).catch(console.error);
+  loadSettings();
+  // Auto-send credentials
+  const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
+  if(s.mtUser||s.pvUser){
+    fetch(SERVER+'/api/credentials',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({myterminals:{username:s.mtUser||'MAFLeeP',password:s.mtPass||'Atm_6085!'},perativ:{username:s.pvUser||'MARC-ANTOINE',password:s.pvPass||'ePQb4PadBMrSKYu!'},threshold:s.threshold||500})
+    }).catch(console.error);
+  } else {
+    // Use Railway env vars directly
+    fetch(SERVER+'/api/credentials',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({myterminals:{username:'MAFLeeP',password:'Atm_6085!'},perativ:{username:'MARC-ANTOINE',password:'ePQb4PadBMrSKYu!'},threshold:500})
+    }).catch(console.error);
+  }
   fetchData();
   scheduleNextRefresh();
 }
+
 async function registerBiometrics(){
   try{
     const cred=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'ATM CYBER 25',id:location.hostname},user:{id:new Uint8Array(16),name:'user',displayName:'ATM User'},pubKeyCredParams:[{alg:-7,type:'public-key'},{alg:-257,type:'public-key'}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});
@@ -313,6 +374,7 @@ async function registerBiometrics(){
     document.getElementById('faceIdBtn').classList.remove('hidden');
   }catch(e){console.log('Biometrics not available');}
 }
+
 async function doFaceId(){
   try{
     const credId=localStorage.getItem('atm_cred_id');
@@ -324,17 +386,20 @@ async function doFaceId(){
   }catch(e){document.getElementById('loginError').textContent='Face ID échoué — entrez le mot de passe';}
 }
 
-// DISTANCES
-const CITY_COORDS={'sherbrooke':{lat:45.4042,lng:-71.8929},'sutton':{lat:45.1253,lng:-72.6089},'brome':{lat:45.1800,lng:-72.5200},'magog':{lat:45.2667,lng:-72.1500},'granby':{lat:45.4000,lng:-72.7333},'windsor':{lat:45.5667,lng:-71.9833},'waterville':{lat:45.2667,lng:-71.9000},'coaticook':{lat:45.1333,lng:-71.8000},'cowansville':{lat:45.2000,lng:-72.7500},'lac-megantic':{lat:45.5833,lng:-70.8833},'ascot corner':{lat:45.4833,lng:-71.7000},'east angus':{lat:45.4833,lng:-71.6667}};
-function getCoords(t){const c=(t.city||'').toLowerCase().trim();if(CITY_COORDS[c])return CITY_COORDS[c];for(const[k,v]of Object.entries(CITY_COORDS)){if(c.includes(k)||k.includes(c))return v;}return null;}
-function distanceKm(la1,lo1,la2,lo2){const R=6371,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180,a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
-function getDistance(t){const c=getCoords(t);if(!c)return 9999;return distanceKm(BASE_LAT,BASE_LNG,c.lat,c.lng);}
-
 // THRESHOLDS
 function getThresholds(){try{return JSON.parse(localStorage.getItem('atm_thresholds')||'{}');}catch(e){return{};}}
 function setThresholdForTerminal(id,v){const t=getThresholds();if(v===null)delete t[id];else t[id]=v;localStorage.setItem('atm_thresholds',JSON.stringify(t));}
 function getThresholdForTerminal(id){const t=getThresholds();const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');return t[id]!==undefined?t[id]:(s.threshold||500);}
-function openThresholdModal(e,id,name){e.stopPropagation();currentModalId=id;const t=getThresholds();const g=JSON.parse(localStorage.getItem('atm_cfg')||'{}').threshold||500;document.getElementById('modalName').textContent=name;document.getElementById('modalInput').value=t[id]!==undefined?t[id]:'';document.getElementById('modalInput').placeholder='Seuil global: $'+g;document.getElementById('thresholdModal').classList.add('show');setTimeout(()=>document.getElementById('modalInput').focus(),100);}
+
+function openThresholdModal(e,id,name){
+  e.stopPropagation();currentModalId=id;
+  const t=getThresholds();const g=JSON.parse(localStorage.getItem('atm_cfg')||'{}').threshold||500;
+  document.getElementById('modalName').textContent=name;
+  document.getElementById('modalInput').value=t[id]!==undefined?t[id]:'';
+  document.getElementById('modalInput').placeholder='Seuil global: $'+g;
+  document.getElementById('thresholdModal').classList.add('show');
+  setTimeout(()=>document.getElementById('modalInput').focus(),100);
+}
 function closeThresholdModal(){document.getElementById('thresholdModal').classList.remove('show');currentModalId=null;}
 function saveThreshold(){const v=parseInt(document.getElementById('modalInput').value);if(!isNaN(v)&&v>=0){setThresholdForTerminal(currentModalId,v);closeThresholdModal();renderList();renderStats();renderOrderBanner();}}
 function resetThreshold(){setThresholdForTerminal(currentModalId,null);closeThresholdModal();renderList();renderStats();renderOrderBanner();}
@@ -342,11 +407,53 @@ document.getElementById('thresholdModal').addEventListener('click',function(e){i
 
 // SELECTION
 function toggleSelect(id){if(selectedIds.has(id))selectedIds.delete(id);else selectedIds.add(id);renderList();updateFillBar();}
-function updateFillBar(){const bar=document.getElementById('fillBar');if(selectedIds.size===0){bar.classList.remove('show');return;}bar.classList.add('show');let total=0;selectedIds.forEach(id=>{const t=terminals.find(t=>(t.terminal_id||t.name)===id);if(t){const th=getThresholdForTerminal(id);const amt=t.amount||0;if(amt<th)total+=(th-amt);}});document.getElementById('fillCount').textContent=selectedIds.size;document.getElementById('fillTotal').textContent='$'+total.toLocaleString('fr-CA',{maximumFractionDigits:0});}
+function updateFillBar(){
+  const bar=document.getElementById('fillBar');
+  if(selectedIds.size===0){bar.classList.remove('show');return;}
+  bar.classList.add('show');
+  let total=0;
+  selectedIds.forEach(id=>{const t=terminals.find(t=>(t.terminal_id||t.name)===id);if(t){const th=getThresholdForTerminal(id);const amt=t.amount||0;if(amt<th)total+=(th-amt);}});
+  document.getElementById('fillCount').textContent=selectedIds.size;
+  document.getElementById('fillTotal').textContent='$'+total.toLocaleString('fr-CA',{maximumFractionDigits:0});
+}
 function clearSelection(){selectedIds.clear();renderList();updateFillBar();}
 
 // EXPORT
-function showExport(){const selected=terminals.filter(t=>selectedIds.has(t.terminal_id||t.name)).map(t=>({...t,distance:getDistance(t)})).sort((a,b)=>a.distance-b.distance);const now=new Date();let text='🏧 ATM CYBER 25 INC.\nListe de remplissage\n'+now.toLocaleDateString('fr-CA')+' '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})+'\n━━━━━━━━━━━━━━━━━━━━\n\n';let totalOrder=0;selected.forEach((t,i)=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount||0;const toOrder=Math.max(0,th-amt);totalOrder+=toOrder;const dist=t.distance<9999?' (~'+t.distance.toFixed(0)+'km)':'';text+=(i+1)+'. '+t.name+dist+'\n';if(t.city)text+='   📍 '+t.city+'\n';text+='   💵 En caisse: $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n   📦 À mettre: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n\n';});text+='━━━━━━━━━━━━━━━━━━━━\n💰 TOTAL: $'+totalOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n'+selected.length+' guichet'+(selected.length>1?'s':'')+' à remplir';document.getElementById('exportText').textContent=text;document.getElementById('exportModal').classList.add('show');}
+function showExport(){
+  const selected=terminals
+    .filter(t=>selectedIds.has(t.terminal_id||t.name))
+    .map(t=>({...t,distance:getDistance(t)}))
+    .sort((a,b)=>a.distance-b.distance);
+
+  mapsUrl=buildMapsUrl(selected);
+
+  const now=new Date();
+  let text='🏧 ATM CYBER 25 INC.\nListe de remplissage\n';
+  text+=now.toLocaleDateString('fr-CA')+' '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})+'\n';
+  text+='📍 Départ: Sutton (161 rue Principale Sud)\n';
+  text+='━━━━━━━━━━━━━━━━━━━━\n\n';
+  let totalOrder=0;
+  selected.forEach((t,i)=>{
+    const id=t.terminal_id||t.name;
+    const th=getThresholdForTerminal(id);
+    const amt=t.amount||0;
+    const toOrder=Math.max(0,th-amt);
+    totalOrder+=toOrder;
+    const dist=t.distance<9999?' (~'+t.distance.toFixed(0)+'km)':'';
+    text+=(i+1)+'. '+t.name+dist+'\n';
+    if(t.city)text+='   📍 '+t.city+'\n';
+    text+='   💵 En caisse: $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';
+    text+='   📦 À mettre: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n\n';
+  });
+  text+='━━━━━━━━━━━━━━━━━━━━\n';
+  text+='💰 TOTAL: $'+totalOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';
+  text+=selected.length+' guichet'+(selected.length>1?'s':'')+' à remplir';
+
+  document.getElementById('exportSubtitle').textContent=selected.length+' guichets — triés par distance depuis Sutton';
+  document.getElementById('exportText').textContent=text;
+  document.getElementById('exportModal').classList.add('show');
+}
+
 function closeExportModal(){document.getElementById('exportModal').classList.remove('show');}
 document.getElementById('exportModal').addEventListener('click',function(e){if(e.target===this)closeExportModal();});
 function copyList(){const text=document.getElementById('exportText').textContent;navigator.clipboard.writeText(text).then(()=>{const btn=document.querySelector('.btn-copy');btn.textContent='✅ Copié!';setTimeout(()=>{btn.textContent='📋 Copier';},2000);});}
@@ -354,20 +461,139 @@ function sendSMS(){window.open('sms:?body='+encodeURIComponent(document.getEleme
 function sendEmail(){window.open('mailto:?subject='+encodeURIComponent('ATM CYBER 25 - Liste de remplissage')+'&body='+encodeURIComponent(document.getElementById('exportText').textContent));}
 
 // SETTINGS
-function loadSettings(){try{const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');if(s.mtUser)document.getElementById('mtUser').value=s.mtUser;if(s.mtPass)document.getElementById('mtPass').value=s.mtPass;if(s.pvUser)document.getElementById('pvUser').value=s.pvUser;if(s.pvPass)document.getElementById('pvPass').value=s.pvPass;if(s.threshold!==undefined)document.getElementById('threshold').value=s.threshold;}catch(e){}}
-function saveSettings(){const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};localStorage.setItem('atm_cfg',JSON.stringify(s));fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);mobileView('dash');setTimeout(fetchData,2000);}
+function loadSettings(){
+  try{
+    const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
+    if(s.mtUser)document.getElementById('mtUser').value=s.mtUser;
+    if(s.mtPass)document.getElementById('mtPass').value=s.mtPass;
+    if(s.pvUser)document.getElementById('pvUser').value=s.pvUser;
+    if(s.pvPass)document.getElementById('pvPass').value=s.pvPass;
+    if(s.threshold!==undefined)document.getElementById('threshold').value=s.threshold;
+  }catch(e){}
+}
+function saveSettings(){
+  const s={mtUser:document.getElementById('mtUser').value.trim(),mtPass:document.getElementById('mtPass').value,pvUser:document.getElementById('pvUser').value.trim(),pvPass:document.getElementById('pvPass').value,threshold:parseInt(document.getElementById('threshold').value)||500};
+  localStorage.setItem('atm_cfg',JSON.stringify(s));
+  fetch(SERVER+'/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({myterminals:{username:s.mtUser,password:s.mtPass},perativ:{username:s.pvUser,password:s.pvPass},threshold:s.threshold})}).catch(console.error);
+  mobileView('dash');setTimeout(fetchData,2000);
+}
+
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderList();}
-function mobileView(v){['settingsPanel','perativPanel','alertPanel'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('mobile-show',v==='set');});document.getElementById('navDash').classList.toggle('active',v==='dash');document.getElementById('navSet').classList.toggle('active',v==='set');const tl=document.getElementById('termList');const sw=document.querySelector('.search-wrap');if(tl)tl.style.display=v==='dash'?'':'none';if(sw)sw.style.display=v==='dash'?'':'none';}
+function mobileView(v){
+  ['settingsPanel','perativPanel','alertPanel'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('mobile-show',v==='set');});
+  document.getElementById('navDash').classList.toggle('active',v==='dash');
+  document.getElementById('navSet').classList.toggle('active',v==='set');
+  const tl=document.getElementById('termList');const sw=document.querySelector('.search-wrap');
+  if(tl)tl.style.display=v==='dash'?'':'none';
+  if(sw)sw.style.display=v==='dash'?'':'none';
+}
 
 // DATA
-async function fetchData(){try{const res=await fetch(SERVER+'/api/data');const data=await res.json();terminals=data.terminals||[];const now=new Date();document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});renderList();renderStats();renderAlerts();renderOrderBanner();updateFillBar();}catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}}
-async function doRefresh(){const btn=document.getElementById('refreshBtn');btn.classList.add('spinning');setLoading();try{await fetch(SERVER+'/api/refresh',{method:'POST'});await new Promise(r=>setTimeout(r,8000));await fetchData();}catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}btn.classList.remove('spinning');scheduleNextRefresh();}
-function scheduleNextRefresh(){if(autoRefreshTimer)clearTimeout(autoRefreshTimer);if(countdownTimer)clearInterval(countdownTimer);const INTERVAL=5*60*1000;nextRefreshTime=Date.now()+INTERVAL;autoRefreshTimer=setTimeout(()=>doRefresh(),INTERVAL);countdownTimer=setInterval(()=>{const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));const min=Math.floor(remaining/60);const sec=remaining%60;document.getElementById('nextRefresh').textContent='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');if(remaining===0)clearInterval(countdownTimer);},1000);}
+async function fetchData(){
+  try{
+    const res=await fetch(SERVER+'/api/data');
+    const data=await res.json();
+    terminals=data.terminals||[];
+    const now=new Date();
+    document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});
+    renderList();renderStats();renderAlerts();renderOrderBanner();updateFillBar();
+  }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
+}
+
+async function doRefresh(){
+  const btn=document.getElementById('refreshBtn');
+  btn.classList.add('spinning');setLoading();
+  try{
+    await fetch(SERVER+'/api/refresh',{method:'POST'});
+    await new Promise(r=>setTimeout(r,8000));
+    await fetchData();
+  }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
+  btn.classList.remove('spinning');scheduleNextRefresh();
+}
+
+function scheduleNextRefresh(){
+  if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
+  if(countdownTimer)clearInterval(countdownTimer);
+  const INTERVAL=5*60*1000;
+  nextRefreshTime=Date.now()+INTERVAL;
+  autoRefreshTimer=setTimeout(()=>doRefresh(),INTERVAL);
+  countdownTimer=setInterval(()=>{
+    const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));
+    const min=Math.floor(remaining/60);const sec=remaining%60;
+    document.getElementById('nextRefresh').textContent='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');
+    if(remaining===0)clearInterval(countdownTimer);
+  },1000);
+}
+
 function setLoading(){document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="state-text">Connexion aux guichets...</div></div>';}
-function renderStats(){let low=0,empty=0,totalCash=0,count=0;terminals.forEach(t=>{const th=getThresholdForTerminal(t.terminal_id||t.name);const amt=t.amount;if(amt!==null&&amt!==undefined){totalCash+=amt;count++;if(amt===0)empty++;else if(amt<th)low++;}});document.getElementById('sTotal').textContent=terminals.length||'—';document.getElementById('sCash').textContent=count>0?'$'+totalCash.toLocaleString('fr-CA',{maximumFractionDigits:0}):'—';document.getElementById('sLow').textContent=terminals.length?low:'—';document.getElementById('sEmpty').textContent=terminals.length?empty:'—';}
-function renderOrderBanner(){let totalToOrder=0,count=0;terminals.forEach(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;if(amt!==null&&amt<th){totalToOrder+=(th-amt);count++;}});const banner=document.getElementById('orderBanner');if(totalToOrder>0){banner.style.display='block';document.getElementById('orderTotal').textContent='$'+totalToOrder.toLocaleString('fr-CA',{maximumFractionDigits:0});document.getElementById('orderCount').textContent=count+' guichet'+(count>1?'s':'')+' à remplir';}else{banner.style.display='none';}}
-function renderAlerts(){const alerts=[];terminals.forEach(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;if(amt!==null&&amt!==undefined){if(amt===0)alerts.push({msg:'🚨 VIDE: '+t.name+' — Commander $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0})});else if(amt<th)alerts.push({msg:'⚠️ BAS: '+t.name+' — $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+' (commander $'+(th-amt).toLocaleString('fr-CA',{maximumFractionDigits:0})+')'});}});const b=document.getElementById('alertBanner');if(!alerts.length){b.classList.remove('show');return;}b.classList.add('show');document.getElementById('alertItems').innerHTML=alerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');}
-function renderList(){const q=document.getElementById('searchBox').value.toLowerCase();let list=terminals;if(activeFilter!=='all')list=list.filter(t=>t.source===activeFilter);if(q)list=list.filter(t=>(t.name||'').toLowerCase().includes(q));if(!list.length){document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="state-text">Chargement des guichets...</div></div>';return;}list=[...list].sort((a,b)=>rank(a,getThresholdForTerminal(a.terminal_id||a.name))-rank(b,getThresholdForTerminal(b.terminal_id||b.name)));const thresholds=getThresholds();document.getElementById('termList').innerHTML=list.map(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;let st,cls,disp;if(amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}else if(amt===0){st='empty';cls='empty';disp='$0';}else if(amt<th){st='low';cls='low';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}else{st='ok';cls='ok';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}const src=t.source==='myterminals'?'MyTerminals':'Perativ';const customTh=thresholds[id]!==undefined;const thLabel=(customTh?'⚡':'')+'Seuil: $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0});const toOrder=(amt!==null&&amt<th)?(th-amt):0;const toOrderStr=toOrder>0?'Commander: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0}):'';const isSelected=selectedIds.has(id);const eName=t.name.replace(/'/g,"\\'");return'<div class="card '+st+(isSelected?' selected':'')+'" onclick="toggleSelect(\''+id+'\')">'+'<div class="card-check">'+(isSelected?'✓':'')+'</div>'+'<div class="card-info"><div class="card-name">'+t.name+'</div><div class="card-source">'+src+(t.city?' · '+t.city:'')+'</div><div class="card-meta"><span>'+thLabel+'</span>'+(toOrderStr?'<span class="to-order">'+toOrderStr+'</span>':'')+'</div></div>'+'<button class="edit-btn" onclick="openThresholdModal(event,\''+id+'\',\''+eName+'\')">✏️</button>'+'<div class="card-amounts"><div class="card-amount '+cls+'">'+disp+'</div>'+(toOrder>0?'<div class="card-order">+$'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'</div>':'')+'</div></div>';}).join('');}
+
+function renderStats(){
+  let low=0,empty=0,totalCash=0,count=0;
+  terminals.forEach(t=>{const th=getThresholdForTerminal(t.terminal_id||t.name);const amt=t.amount;if(amt!==null&&amt!==undefined){totalCash+=amt;count++;if(amt===0)empty++;else if(amt<th)low++;}});
+  document.getElementById('sTotal').textContent=terminals.length||'—';
+  document.getElementById('sCash').textContent=count>0?'$'+totalCash.toLocaleString('fr-CA',{maximumFractionDigits:0}):'—';
+  document.getElementById('sLow').textContent=terminals.length?low:'—';
+  document.getElementById('sEmpty').textContent=terminals.length?empty:'—';
+}
+
+function renderOrderBanner(){
+  let totalToOrder=0,count=0;
+  terminals.forEach(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;if(amt!==null&&amt<th){totalToOrder+=(th-amt);count++;}});
+  const banner=document.getElementById('orderBanner');
+  if(totalToOrder>0){
+    banner.style.display='block';
+    document.getElementById('orderTotal').textContent='$'+totalToOrder.toLocaleString('fr-CA',{maximumFractionDigits:0});
+    document.getElementById('orderCount').textContent=count+' guichet'+(count>1?'s':'')+' à remplir';
+  }else{banner.style.display='none';}
+}
+
+function renderAlerts(){
+  const alerts=[];
+  terminals.forEach(t=>{const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;if(amt!==null&&amt!==undefined){if(amt===0)alerts.push({msg:'🚨 VIDE: '+t.name+' — Commander $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0})});else if(amt<th)alerts.push({msg:'⚠️ BAS: '+t.name+' — $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+' (commander $'+(th-amt).toLocaleString('fr-CA',{maximumFractionDigits:0})+')'});}});
+  const b=document.getElementById('alertBanner');
+  if(!alerts.length){b.classList.remove('show');return;}
+  b.classList.add('show');
+  document.getElementById('alertItems').innerHTML=alerts.map(a=>'<div class="alert-item">'+a.msg+'</div>').join('');
+}
+
+function renderList(){
+  const q=document.getElementById('searchBox').value.toLowerCase();
+  let list=terminals;
+  if(activeFilter!=='all')list=list.filter(t=>t.source===activeFilter);
+  if(q)list=list.filter(t=>(t.name||'').toLowerCase().includes(q));
+  if(!list.length){
+    document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="state-text">Chargement des guichets...</div></div>';
+    return;
+  }
+  list=[...list].sort((a,b)=>rank(a,getThresholdForTerminal(a.terminal_id||a.name))-rank(b,getThresholdForTerminal(b.terminal_id||b.name)));
+  const thresholds=getThresholds();
+  document.getElementById('termList').innerHTML=list.map(t=>{
+    const id=t.terminal_id||t.name;
+    const th=getThresholdForTerminal(id);
+    const amt=t.amount;
+    let st,cls,disp;
+    if(amt===null||amt===undefined){st='ok';cls='na';disp='N/A';}
+    else if(amt===0){st='empty';cls='empty';disp='$0';}
+    else if(amt<th){st='low';cls='low';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}
+    else{st='ok';cls='ok';disp='$'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0});}
+    const src=t.source==='myterminals'?'MyTerminals':'Perativ';
+    const customTh=thresholds[id]!==undefined;
+    const thLabel=(customTh?'⚡':'')+'Seuil: $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0});
+    const toOrder=(amt!==null&&amt<th)?(th-amt):0;
+    const toOrderStr=toOrder>0?'Commander: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0}):'';
+    const isSelected=selectedIds.has(id);
+    const eName=t.name.replace(/'/g,"\\'");
+    return'<div class="card '+st+(isSelected?' selected':'')+'" onclick="toggleSelect(\''+id+'\')">'
+      +'<div class="card-check">'+(isSelected?'✓':'')+'</div>'
+      +'<div class="card-info"><div class="card-name">'+t.name+'</div><div class="card-source">'+src+(t.city?' · '+t.city:'')+'</div>'
+      +'<div class="card-meta"><span>'+thLabel+'</span>'+(toOrderStr?'<span class="to-order">'+toOrderStr+'</span>':'')+'</div></div>'
+      +'<button class="edit-btn" onclick="openThresholdModal(event,\''+id+'\',\''+eName+'\')">✏️</button>'
+      +'<div class="card-amounts"><div class="card-amount '+cls+'">'+disp+'</div>'
+      +(toOrder>0?'<div class="card-order">+$'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'</div>':'')
+      +'</div></div>';
+  }).join('');
+}
+
 function rank(t,th){if(t.amount===0)return 0;if(t.amount!==null&&t.amount<th)return 1;return 2;}
 
 checkAuth();
