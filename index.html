@@ -29,8 +29,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .main-layout{display:flex;gap:24px;padding:20px 24px;padding-bottom:40px;max-width:1600px;margin:0 auto;}
 @media(max-width:768px){.main-layout{flex-direction:column;padding:12px 16px;padding-bottom:calc(80px + env(safe-area-inset-bottom));}}
 .left-panel{flex:0 0 320px;}
-
-/* STATS - 2x2 grid */
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
 .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 10px;text-align:center;position:relative;overflow:hidden;}
 .stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
@@ -39,16 +37,13 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .stat.s-low::after{background:var(--yellow);}
 .stat.s-empty::after{background:var(--red);}
 .stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;}
-.stat-num.small{font-size:20px;}
+.stat-num.small{font-size:18px;}
 .c-blue{color:var(--blue);}.c-yellow{color:var(--yellow);}.c-red{color:var(--red);}.c-green{color:var(--green);}.c-orange{color:#ff8800;}
 .stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
-
-/* ORDER BANNER */
 .order-banner{background:linear-gradient(135deg,rgba(255,136,0,0.15),rgba(255,45,85,0.1));border:1px solid rgba(255,136,0,0.4);border-radius:var(--r);padding:16px 18px;margin-bottom:16px;}
 .order-banner-title{font-size:10px;color:#ff8800;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
 .order-banner-amount{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#ff8800;line-height:1;}
 .order-banner-sub{font-size:10px;color:var(--muted);margin-top:4px;}
-
 .alert-banner{border-radius:var(--r);background:rgba(255,45,85,0.08);border:1px solid rgba(255,45,85,0.25);overflow:hidden;display:none;margin-bottom:16px;}
 .alert-banner.show{display:block;}
 .alert-header{padding:10px 14px;font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(255,45,85,0.15);}
@@ -62,17 +57,32 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .field input:focus{border-color:var(--green);}
 .save-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green) 0%,var(--blue) 100%);color:#000;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;transition:opacity 0.2s;margin-top:8px;}
 .save-btn:hover{opacity:0.9;}.save-btn:active{opacity:0.75;}
-.search-wrap{margin-bottom:12px;}
+.search-wrap{margin-bottom:8px;}
 .search-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:'Space Mono',monospace;font-size:13px;outline:none;transition:border-color 0.2s;}
 .search-input:focus{border-color:var(--blue);}
 .search-input::placeholder{color:var(--muted);}
 .next-refresh{font-size:10px;color:var(--muted);text-align:center;padding:4px 0 8px;}
 .right-panel{flex:1;min-width:0;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;position:relative;overflow:hidden;transition:all 0.15s;}
+
+/* FILL LIST BAR */
+.fill-bar{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:12px;display:none;}
+.fill-bar.show{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.fill-bar-info{font-size:12px;color:var(--text);}
+.fill-bar-info span{color:var(--green);font-weight:700;}
+.fill-bar-btns{display:flex;gap:8px;}
+.fill-export-btn{padding:8px 14px;border-radius:8px;border:none;background:var(--green);color:#000;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;}
+.fill-clear-btn{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;}
+.fill-clear-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* TERMINAL CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;position:relative;overflow:hidden;transition:all 0.15s;cursor:pointer;}
 .card:hover{border-color:var(--muted);}
 .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
 .card.ok::before{background:var(--green);}.card.low::before{background:var(--yellow);}.card.empty::before{background:var(--red);}
 .card.low{border-color:rgba(255,208,0,0.2);}.card.empty{border-color:rgba(255,45,85,0.25);background:rgba(255,45,85,0.04);}
+.card.selected{border-color:var(--green)!important;background:rgba(0,255,136,0.05)!important;}
+.card-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;font-size:13px;}
+.card.selected .card-check{border-color:var(--green);background:var(--green);color:#000;}
 .card-info{min-width:0;}
 .card-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .card-source{font-size:10px;color:var(--muted);margin-top:2px;}
@@ -85,17 +95,29 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .card-order{font-size:11px;color:#ff8800;text-align:right;}
 .edit-btn{background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:5px 10px;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;transition:all 0.15s;flex-shrink:0;}
 .edit-btn:hover{border-color:var(--green);color:var(--green);}
+
+/* EXPORT MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.show{display:flex;}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:380px;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto;}
 .modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--blue);margin-bottom:6px;}
 .modal-name{font-size:13px;color:var(--muted);margin-bottom:20px;}
 .modal-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--text);font-family:'Space Mono',monospace;font-size:18px;outline:none;text-align:center;margin-bottom:16px;}
 .modal-input:focus{border-color:var(--green);}
-.modal-btns{display:flex;gap:10px;}
+.modal-btns{display:flex;gap:10px;margin-top:16px;}
 .modal-save{flex:1;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--green),var(--blue));color:#000;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;}
 .modal-cancel{flex:1;padding:13px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;}
 .modal-reset{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;cursor:pointer;text-decoration:underline;}
+
+/* EXPORT LIST */
+.export-list{background:var(--card2);border-radius:10px;padding:16px;margin-bottom:16px;font-size:12px;line-height:2;white-space:pre-wrap;word-break:break-all;}
+.export-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.export-action-btn{flex:1;padding:12px;border-radius:10px;border:none;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;min-width:120px;}
+.btn-copy{background:var(--blue);color:#000;}
+.btn-sms{background:var(--green);color:#000;}
+.btn-email{background:var(--yellow);color:#000;}
+.btn-close{background:transparent;border:1px solid var(--border)!important;color:var(--muted);}
+
 .state-box{text-align:center;padding:48px 20px;color:var(--muted);}
 .state-icon{font-size:52px;margin-bottom:14px;}
 .state-text{font-size:13px;line-height:1.7;}
@@ -128,34 +150,30 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 </div>
 <div class="main-layout">
   <div class="left-panel">
-    <!-- 4 STATS -->
     <div class="stats">
       <div class="stat s-total"><div class="stat-num c-blue" id="sTotal">—</div><div class="stat-lbl">Guichets</div></div>
       <div class="stat s-cash"><div class="stat-num c-green small" id="sCash">—</div><div class="stat-lbl">En caisse</div></div>
       <div class="stat s-low"><div class="stat-num c-yellow" id="sLow">—</div><div class="stat-lbl">Bas</div></div>
       <div class="stat s-empty"><div class="stat-num c-red" id="sEmpty">—</div><div class="stat-lbl">Vides</div></div>
     </div>
-
-    <!-- TOTAL TO ORDER -->
     <div class="order-banner" id="orderBanner" style="display:none">
       <div class="order-banner-title">💰 Total à commander</div>
       <div class="order-banner-amount" id="orderTotal">$0</div>
       <div class="order-banner-sub" id="orderCount"></div>
     </div>
-
     <div class="alert-banner" id="alertBanner">
       <div class="alert-header">⚠️ Alertes actives</div>
       <div id="alertItems"></div>
     </div>
     <div class="panel" id="settingsPanel">
       <div class="panel-title">🏧 MyTerminals</div>
-      <div class="field"><label>Utilisateur</label><input type="text" id="mtUser" autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="ex: MAFLeeP"></div>
-      <div class="field"><label>Mot de passe</label><input type="password" id="mtPass" placeholder="••••••••"></div>
+      <div class="field"><label>Utilisateur</label><input type="text" id="mtUser" autocomplete="off" autocorrect="off" autocapitalize="none"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="mtPass"></div>
     </div>
     <div class="panel" id="perativPanel">
       <div class="panel-title">💻 Perativ</div>
-      <div class="field"><label>Utilisateur</label><input type="text" id="pvUser" autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="MARC-ANTOINE"></div>
-      <div class="field"><label>Mot de passe</label><input type="password" id="pvPass" placeholder="••••••••"></div>
+      <div class="field"><label>Utilisateur</label><input type="text" id="pvUser" autocomplete="off" autocorrect="off" autocapitalize="none"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="pvPass"></div>
     </div>
     <div class="panel" id="alertPanel">
       <div class="panel-title">🔔 Seuil Global ($)</div>
@@ -166,8 +184,16 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
   </div>
   <div class="right-panel">
     <div class="search-wrap">
-      <input class="search-input" type="search" placeholder="🔍 Rechercher un guichet..." id="searchBox" oninput="renderList()">
+      <input class="search-input" type="search" placeholder="🔍 Rechercher... (cliquer sur un guichet pour l'ajouter à la liste)" id="searchBox" oninput="renderList()">
     </div>
+    <div class="fill-bar" id="fillBar">
+      <div class="fill-bar-info">📋 <span id="fillCount">0</span> guichet(s) sélectionné(s) — Total: <span id="fillTotal" class="c-orange">$0</span></div>
+      <div class="fill-bar-btns">
+        <button class="fill-export-btn" onclick="showExport()">📤 Exporter</button>
+        <button class="fill-clear-btn" onclick="clearSelection()">✕ Vider</button>
+      </div>
+    </div>
+    <div class="next-refresh" id="nextRefresh2"></div>
     <div id="termList">
       <div class="state-box">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -180,41 +206,195 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
   <button class="nav-btn active" id="navDash" onclick="mobileView('dash')"><span class="nav-icon">📊</span>Dashboard</button>
   <button class="nav-btn" id="navSet" onclick="mobileView('set')"><span class="nav-icon">⚙️</span>Réglages</button>
 </div>
-<div class="modal-overlay" id="modalOverlay">
+
+<!-- THRESHOLD MODAL -->
+<div class="modal-overlay" id="thresholdModal">
   <div class="modal">
     <div class="modal-title">Seuil d'alerte</div>
     <div class="modal-name" id="modalName"></div>
     <input class="modal-input" type="number" id="modalInput" placeholder="ex: 1000" min="0">
     <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeModal()">ANNULER</button>
+      <button class="modal-cancel" onclick="closeThresholdModal()">ANNULER</button>
       <button class="modal-save" onclick="saveThreshold()">SAUVEGARDER</button>
     </div>
     <div class="modal-reset" onclick="resetThreshold()">Utiliser le seuil global</div>
   </div>
 </div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <div class="modal-title">📋 Liste de remplissage</div>
+    <div class="modal-name">Triée par distance depuis Sutton</div>
+    <div class="export-list" id="exportText"></div>
+    <div class="export-actions">
+      <button class="export-action-btn btn-copy" onclick="copyList()">📋 Copier</button>
+      <button class="export-action-btn btn-sms" onclick="sendSMS()">💬 Texto</button>
+      <button class="export-action-btn btn-email" onclick="sendEmail()">📧 Email</button>
+      <button class="export-action-btn btn-close" onclick="closeExportModal()" style="border:1px solid var(--border)">✕ Fermer</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SERVER='https://atm-monitor-production.up.railway.app';
-let terminals=[],activeFilter='all',autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null,currentModalId=null;
+const BASE_LAT=45.1253; // Sutton, QC - 161 rue Principale Sud
+const BASE_LNG=-72.6089;
 
+let terminals=[],activeFilter='all';
+let autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null;
+let currentModalId=null;
+let selectedIds=new Set();
+
+// COORDINATES for known cities
+const CITY_COORDS={
+  'sherbrooke':{lat:45.4042,lng:-71.8929},
+  'sutton':{lat:45.1253,lng:-72.6089},
+  'brome':{lat:45.1800,lng:-72.5200},
+  'magog':{lat:45.2667,lng:-72.1500},
+  'granby':{lat:45.4000,lng:-72.7333},
+  'windsor':{lat:45.5667,lng:-71.9833},
+  'waterville':{lat:45.2667,lng:-71.9000},
+  'coaticook':{lat:45.1333,lng:-71.8000},
+  'cowansville':{lat:45.2000,lng:-72.7500},
+  'lac-megantic':{lat:45.5833,lng:-70.8833},
+  'ascot corner':{lat:45.4833,lng:-71.7000},
+  'east angus':{lat:45.4833,lng:-71.6667},
+};
+
+function getCoords(terminal){
+  const city=(terminal.city||'').toLowerCase().trim();
+  if(CITY_COORDS[city])return CITY_COORDS[city];
+  // Try partial match
+  for(const [k,v] of Object.entries(CITY_COORDS)){
+    if(city.includes(k)||k.includes(city))return v;
+  }
+  return null;
+}
+
+function distanceKm(lat1,lng1,lat2,lng2){
+  const R=6371;
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function getDistance(terminal){
+  const coords=getCoords(terminal);
+  if(!coords)return 9999;
+  return distanceKm(BASE_LAT,BASE_LNG,coords.lat,coords.lng);
+}
+
+// THRESHOLDS
 function getThresholds(){try{return JSON.parse(localStorage.getItem('atm_thresholds')||'{}');}catch(e){return{};}}
 function setThresholdForTerminal(id,value){const t=getThresholds();if(value===null)delete t[id];else t[id]=value;localStorage.setItem('atm_thresholds',JSON.stringify(t));}
 function getThresholdForTerminal(id){const t=getThresholds();const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');return t[id]!==undefined?t[id]:(s.threshold||500);}
 
-function openModal(id,name){
+// THRESHOLD MODAL
+function openThresholdModal(e,id,name){
+  e.stopPropagation();
   currentModalId=id;
   const t=getThresholds();
   const globalTh=JSON.parse(localStorage.getItem('atm_cfg')||'{}').threshold||500;
   document.getElementById('modalName').textContent=name;
   document.getElementById('modalInput').value=t[id]!==undefined?t[id]:'';
   document.getElementById('modalInput').placeholder='Seuil global: $'+globalTh;
-  document.getElementById('modalOverlay').classList.add('show');
+  document.getElementById('thresholdModal').classList.add('show');
   setTimeout(()=>document.getElementById('modalInput').focus(),100);
 }
-function closeModal(){document.getElementById('modalOverlay').classList.remove('show');currentModalId=null;}
-function saveThreshold(){const val=parseInt(document.getElementById('modalInput').value);if(!isNaN(val)&&val>=0){setThresholdForTerminal(currentModalId,val);closeModal();renderList();renderStats();renderOrderBanner();}}
-function resetThreshold(){setThresholdForTerminal(currentModalId,null);closeModal();renderList();renderStats();renderOrderBanner();}
-document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+function closeThresholdModal(){document.getElementById('thresholdModal').classList.remove('show');currentModalId=null;}
+function saveThreshold(){const val=parseInt(document.getElementById('modalInput').value);if(!isNaN(val)&&val>=0){setThresholdForTerminal(currentModalId,val);closeThresholdModal();renderList();renderStats();renderOrderBanner();}}
+function resetThreshold(){setThresholdForTerminal(currentModalId,null);closeThresholdModal();renderList();renderStats();renderOrderBanner();}
+document.getElementById('thresholdModal').addEventListener('click',function(e){if(e.target===this)closeThresholdModal();});
 
+// SELECTION
+function toggleSelect(id){
+  if(selectedIds.has(id))selectedIds.delete(id);
+  else selectedIds.add(id);
+  renderList();
+  updateFillBar();
+}
+
+function updateFillBar(){
+  const bar=document.getElementById('fillBar');
+  if(selectedIds.size===0){bar.classList.remove('show');return;}
+  bar.classList.add('show');
+  let total=0;
+  selectedIds.forEach(id=>{
+    const t=terminals.find(t=>(t.terminal_id||t.name)===id);
+    if(t){
+      const th=getThresholdForTerminal(id);
+      const amt=t.amount||0;
+      if(amt<th)total+=(th-amt);
+    }
+  });
+  document.getElementById('fillCount').textContent=selectedIds.size;
+  document.getElementById('fillTotal').textContent='$'+total.toLocaleString('fr-CA',{maximumFractionDigits:0});
+}
+
+function clearSelection(){selectedIds.clear();renderList();updateFillBar();}
+
+// EXPORT
+function showExport(){
+  // Get selected terminals sorted by distance from Sutton
+  const selected=terminals
+    .filter(t=>selectedIds.has(t.terminal_id||t.name))
+    .map(t=>({...t,distance:getDistance(t)}))
+    .sort((a,b)=>a.distance-b.distance);
+
+  const now=new Date();
+  let text='🏧 ATM CYBER 25 INC.\n';
+  text+='Liste de remplissage\n';
+  text+=now.toLocaleDateString('fr-CA')+' '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})+'\n';
+  text+='━━━━━━━━━━━━━━━━━━━━\n\n';
+
+  let totalOrder=0;
+  selected.forEach((t,i)=>{
+    const id=t.terminal_id||t.name;
+    const th=getThresholdForTerminal(id);
+    const amt=t.amount||0;
+    const toOrder=Math.max(0,th-amt);
+    totalOrder+=toOrder;
+    const dist=t.distance<9999?(' (~'+t.distance.toFixed(0)+'km)'):'';
+    text+=(i+1)+'. '+t.name+dist+'\n';
+    if(t.city)text+='   📍 '+t.city+'\n';
+    text+='   💵 En caisse: $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';
+    text+='   📦 À mettre: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n\n';
+  });
+
+  text+='━━━━━━━━━━━━━━━━━━━━\n';
+  text+='💰 TOTAL À COMMANDER: $'+totalOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';
+  text+=selected.length+' guichet'+(selected.length>1?'s':'')+' à remplir';
+
+  document.getElementById('exportText').textContent=text;
+  document.getElementById('exportModal').classList.add('show');
+}
+
+function closeExportModal(){document.getElementById('exportModal').classList.remove('show');}
+document.getElementById('exportModal').addEventListener('click',function(e){if(e.target===this)closeExportModal();});
+
+function copyList(){
+  const text=document.getElementById('exportText').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.querySelector('.btn-copy');
+    btn.textContent='✅ Copié!';
+    setTimeout(()=>{btn.textContent='📋 Copier';},2000);
+  });
+}
+
+function sendSMS(){
+  const text=encodeURIComponent(document.getElementById('exportText').textContent);
+  window.open('sms:?body='+text);
+}
+
+function sendEmail(){
+  const text=encodeURIComponent(document.getElementById('exportText').textContent);
+  const subject=encodeURIComponent('ATM CYBER 25 - Liste de remplissage');
+  window.open('mailto:?subject='+subject+'&body='+text);
+}
+
+// SETTINGS
 function loadSettings(){
   try{
     const s=JSON.parse(localStorage.getItem('atm_cfg')||'{}');
@@ -252,7 +432,7 @@ async function fetchData(){
     terminals=data.terminals||[];
     const now=new Date();
     document.getElementById('syncTime').textContent='Sync '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'});
-    renderList();renderStats();renderAlerts();renderOrderBanner();
+    renderList();renderStats();renderAlerts();renderOrderBanner();updateFillBar();
   }catch(e){document.getElementById('syncTime').textContent='⚠️ Erreur';}
 }
 
@@ -276,7 +456,9 @@ function scheduleNextRefresh(){
   countdownTimer=setInterval(()=>{
     const remaining=Math.max(0,Math.ceil((nextRefreshTime-Date.now())/1000));
     const min=Math.floor(remaining/60);const sec=remaining%60;
-    document.getElementById('nextRefresh').textContent='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');
+    const txt='⟳ Auto-refresh dans '+min+':'+sec.toString().padStart(2,'0');
+    document.getElementById('nextRefresh').textContent=txt;
+    if(document.getElementById('nextRefresh2'))document.getElementById('nextRefresh2').textContent=txt;
     if(remaining===0)clearInterval(countdownTimer);
   },1000);
 }
@@ -288,12 +470,7 @@ function renderStats(){
   terminals.forEach(t=>{
     const th=getThresholdForTerminal(t.terminal_id||t.name);
     const amt=t.amount;
-    if(amt!==null&&amt!==undefined){
-      totalCash+=amt;
-      count++;
-      if(amt===0)empty++;
-      else if(amt<th)low++;
-    }
+    if(amt!==null&&amt!==undefined){totalCash+=amt;count++;if(amt===0)empty++;else if(amt<th)low++;}
   });
   document.getElementById('sTotal').textContent=terminals.length||'—';
   document.getElementById('sCash').textContent=count>0?'$'+totalCash.toLocaleString('fr-CA',{maximumFractionDigits:0}):'—';
@@ -304,9 +481,7 @@ function renderStats(){
 function renderOrderBanner(){
   let totalToOrder=0,count=0;
   terminals.forEach(t=>{
-    const id=t.terminal_id||t.name;
-    const th=getThresholdForTerminal(id);
-    const amt=t.amount;
+    const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;
     if(amt!==null&&amt<th){totalToOrder+=(th-amt);count++;}
   });
   const banner=document.getElementById('orderBanner');
@@ -320,9 +495,7 @@ function renderOrderBanner(){
 function renderAlerts(){
   const alerts=[];
   terminals.forEach(t=>{
-    const id=t.terminal_id||t.name;
-    const th=getThresholdForTerminal(id);
-    const amt=t.amount;
+    const id=t.terminal_id||t.name;const th=getThresholdForTerminal(id);const amt=t.amount;
     if(amt!==null&&amt!==undefined){
       if(amt===0)alerts.push({msg:'🚨 VIDE: '+t.name+' — Commander $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0})});
       else if(amt<th)alerts.push({msg:'⚠️ BAS: '+t.name+' — $'+amt.toLocaleString('fr-CA',{maximumFractionDigits:0})+' (commander $'+(th-amt).toLocaleString('fr-CA',{maximumFractionDigits:0})+')'});
@@ -363,14 +536,17 @@ function renderList(){
     const thLabel=(customTh?'⚡':'')+'Seuil: $'+th.toLocaleString('fr-CA',{maximumFractionDigits:0});
     const toOrder=(amt!==null&&amt<th)?(th-amt):0;
     const toOrderStr=toOrder>0?'Commander: $'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0}):'';
+    const isSelected=selectedIds.has(id);
     const eName=t.name.replace(/'/g,"\\'");
-    return '<div class="card '+st+'">'
+    const checkMark=isSelected?'✓':'';
+    return '<div class="card '+st+(isSelected?' selected':'')+'" onclick="toggleSelect(\''+id+'\')">'
+      +'<div class="card-check">'+checkMark+'</div>'
       +'<div class="card-info">'
         +'<div class="card-name">'+t.name+'</div>'
-        +'<div class="card-source">'+src+'</div>'
+        +'<div class="card-source">'+src+(t.city?' · '+t.city:'')+'</div>'
         +'<div class="card-meta"><span>'+thLabel+'</span>'+(toOrderStr?'<span class="to-order">'+toOrderStr+'</span>':'')+'</div>'
       +'</div>'
-      +'<button class="edit-btn" onclick="openModal(\''+id+'\',\''+eName+'\')">✏️ Seuil</button>'
+      +'<button class="edit-btn" onclick="openThresholdModal(event,\''+id+'\',\''+eName+'\')">✏️</button>'
       +'<div class="card-amounts">'
         +'<div class="card-amount '+cls+'">'+disp+'</div>'
         +(toOrder>0?'<div class="card-order">+$'+toOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'</div>':'')
