@@ -111,7 +111,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .modal-overlay.show{display:flex;}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;}
 .modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--blue);margin-bottom:6px;}
-.modal-name{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.modal-name{font-size:13px;color:var(--muted);margin-bottom:16px;}
 .modal-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--text);font-family:'Space Mono',monospace;font-size:18px;outline:none;text-align:center;margin-bottom:16px;}
 .modal-input:focus{border-color:var(--green);}
 .modal-btns{display:flex;gap:10px;margin-top:16px;}
@@ -120,11 +120,11 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 .modal-reset{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;cursor:pointer;text-decoration:underline;}
 .export-list{background:var(--card2);border-radius:10px;padding:16px;margin-bottom:12px;font-size:12px;line-height:2;white-space:pre-wrap;word-break:break-all;max-height:240px;overflow-y:auto;}
 .maps-btns{display:flex;gap:8px;margin-bottom:8px;}
-.maps-btn{flex:1;padding:13px;border-radius:12px;border:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
-.maps-btn:active{opacity:0.85;}
-.maps-btn.apple{background:linear-gradient(135deg,#555,#222);border:1px solid #444;}
+.maps-btn{flex:1;padding:13px;border-radius:12px;border:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s;}
+.maps-btn:active{opacity:0.8;}
+.maps-btn.waze{background:linear-gradient(135deg,#05c8f0,#00c0e8);}
 .maps-btn.google{background:linear-gradient(135deg,#4285f4,#34a853);}
-.maps-note{font-size:10px;color:var(--muted);text-align:center;margin-bottom:12px;}
+.maps-note{font-size:10px;color:var(--muted);text-align:center;margin-bottom:12px;padding:6px;background:rgba(255,255,255,0.04);border-radius:8px;}
 .export-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .export-action-btn{flex:1;padding:12px;border-radius:10px;border:none;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;min-width:80px;}
 .btn-copy{background:var(--blue);color:#000;}
@@ -243,10 +243,10 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
     <div class="modal-title">📋 Liste de remplissage</div>
     <div class="modal-name" id="exportSubtitle"></div>
     <div class="maps-btns">
-      <button class="maps-btn apple" onclick="openAppleMaps()">🍎 Apple Maps</button>
+      <button class="maps-btn waze" onclick="openWaze()">🚗 Waze</button>
       <button class="maps-btn google" onclick="openGoogleMaps()">🗺️ Google Maps</button>
     </div>
-    <div class="maps-note">📍 Départ & retour Sutton · Parcours optimisé aller-retour</div>
+    <div class="maps-note">📍 Départ & retour Sutton · Waze = 1 stop à la fois · Google = parcours complet optimisé</div>
     <div class="export-list" id="exportText"></div>
     <div class="export-actions">
       <button class="export-action-btn btn-copy" onclick="copyList()">📋 Copier</button>
@@ -261,16 +261,12 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 const SERVER='https://atm-monitor-production.up.railway.app';
 const APP_PASSWORD='Cyber25911!';
 const ORIGIN_ADDRESS='161 rue Principale Sud, Sutton, QC, Canada';
-const ORIGIN_ADDRESS_APPLE='161 rue Principale Sud, Sutton, QC';
 const BASE_LAT=45.1253,BASE_LNG=-72.6089;
 let terminals=[],activeFilter='all';
 let autoRefreshTimer=null,nextRefreshTime=null,countdownTimer=null;
 let currentModalId=null,selectedIds=new Set();
-let googleMapsUrl='',appleMapsUrl='';
+let googleMapsUrl='',wazeUrls=[];
 let fetchRetryTimer=null;
-
-const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||
-  (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 
 const CITY_COORDS={
   'sherbrooke':{lat:45.4042,lng:-71.8929},'sutton':{lat:45.1253,lng:-72.6089},
@@ -303,37 +299,72 @@ function getAddr(t){
   return t.name+', QC, Canada';
 }
 
-// Google Maps URL — optimize:true + retour Sutton
+// Google Maps — optimize:true + retour Sutton
 function buildGoogleMapsUrl(selected){
   if(!selected.length)return 'https://www.google.com/maps/';
   const origin=encodeURIComponent(ORIGIN_ADDRESS);
-  const destination=encodeURIComponent(ORIGIN_ADDRESS);
   const stops=selected.map(t=>encodeURIComponent(getAddr(t)));
   let url='https://www.google.com/maps/dir/?api=1';
-  url+='&origin='+origin+'&destination='+destination;
+  url+='&origin='+origin+'&destination='+origin;
   if(stops.length>0)url+='&waypoints=optimize:true|'+stops.join('|');
   url+='&travelmode=driving';
   return url;
 }
 
-// Apple Maps URL — format maps.apple.com avec waypoints
-function buildAppleMapsUrl(selected){
-  if(!selected.length)return 'https://maps.apple.com/';
-  // Apple Maps supporte jusqu'à 1 destination dans l'URL de base
-  // On utilise le format daddr pour multi-stops
-  const origin=encodeURIComponent(ORIGIN_ADDRESS_APPLE);
-  const stops=selected.map(t=>{
-    if(t.address&&t.city)return encodeURIComponent(t.address+', '+t.city+', QC');
-    if(t.city)return encodeURIComponent(t.name+', '+t.city+', QC');
-    return encodeURIComponent(t.name+', QC');
+// Waze — ouvre tous les stops en séquence
+// Waze ne supporte qu'une destination à la fois
+// On ouvre le premier stop, l'utilisateur continue ensuite
+function buildWazeUrls(selected){
+  return selected.map(t=>{
+    const addr=getAddr(t);
+    return 'https://waze.com/ul?q='+encodeURIComponent(addr)+'&navigate=yes';
   });
-  // Apple Maps: saddr=départ & daddr=arrivée (multi-stop via +to:)
-  const allStops=[...stops,origin].join('+to:');
-  return 'https://maps.apple.com/?saddr='+origin+'&daddr='+allStops+'&dirflg=d';
 }
 
-function openGoogleMaps(){if(googleMapsUrl)window.open(googleMapsUrl,'_blank');}
-function openAppleMaps(){if(appleMapsUrl)window.open(appleMapsUrl,'_blank');}
+function openGoogleMaps(){
+  if(googleMapsUrl)window.open(googleMapsUrl,'_blank');
+}
+
+// Waze — ouvre une fenêtre par stop avec délai
+// Sur iPhone, ouvre l'app Waze directement
+function openWaze(){
+  if(!wazeUrls.length)return;
+  if(wazeUrls.length===1){
+    window.open(wazeUrls[0],'_blank');
+    return;
+  }
+  // Plusieurs stops — affiche un choix
+  const selected=terminals
+    .filter(t=>selectedIds.has(t.terminal_id||t.name))
+    .map(t=>({...t,distance:getDistance(t)}))
+    .sort((a,b)=>a.distance-b.distance);
+
+  // Crée un mini-modal avec la liste des stops Waze
+  const existing=document.getElementById('wazeStopsModal');
+  if(existing)existing.remove();
+
+  const modal=document.createElement('div');
+  modal.id='wazeStopsModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML=`
+    <div style="background:#0f1520;border:1px solid #1e2d40;border-radius:20px;padding:24px;width:100%;max-width:400px;max-height:80vh;overflow-y:auto;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#0af;margin-bottom:6px;">🚗 WAZE — STOPS</div>
+      <div style="font-size:11px;color:#4a6380;margin-bottom:16px;">Appuie sur chaque stop dans l'ordre</div>
+      ${selected.map((t,i)=>`
+        <a href="${wazeUrls[i]}" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#151d2a;border:1px solid #1e2d40;border-radius:12px;margin-bottom:8px;text-decoration:none;color:#e8f4ff;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#00ff88;min-width:28px;">${i+1}</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;">${t.name}</div>
+            <div style="font-size:10px;color:#4a6380;margin-top:2px;">${t.address&&t.city?t.address+', '+t.city:t.city||''}</div>
+          </div>
+        </a>
+      `).join('')}
+      <button onclick="document.getElementById('wazeStopsModal').remove()" style="width:100%;padding:13px;border-radius:10px;border:1px solid #1e2d40;background:transparent;color:#4a6380;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;margin-top:8px;">✕ FERMER</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',function(e){if(e.target===this)this.remove();});
+}
 
 // LOGIN
 function checkAuth(){
@@ -447,12 +478,12 @@ function showExport(){
     .sort((a,b)=>a.distance-b.distance);
 
   googleMapsUrl=buildGoogleMapsUrl(selected);
-  appleMapsUrl=buildAppleMapsUrl(selected);
+  wazeUrls=buildWazeUrls(selected);
 
   const now=new Date();
   let text='🏧 ATM CYBER 25 INC.\nListe de remplissage\n';
   text+=now.toLocaleDateString('fr-CA')+' '+now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})+'\n';
-  text+='📍 Départ & retour: Sutton\n🗺️ Parcours optimisé\n━━━━━━━━━━━━━━━━━━━━\n\n';
+  text+='📍 Départ & retour: Sutton\n━━━━━━━━━━━━━━━━━━━━\n\n';
   let totalOrder=0;
   selected.forEach((t,i)=>{
     const id=t.terminal_id||t.name;
@@ -470,7 +501,7 @@ function showExport(){
   text+='━━━━━━━━━━━━━━━━━━━━\n💰 TOTAL: $'+totalOrder.toLocaleString('fr-CA',{maximumFractionDigits:0})+'\n';
   text+=selected.length+' guichet'+(selected.length>1?'s':'')+' à remplir';
 
-  document.getElementById('exportSubtitle').textContent=selected.length+' guichets — aller-retour optimisé depuis Sutton';
+  document.getElementById('exportSubtitle').textContent=selected.length+' guichets — aller-retour depuis Sutton';
   document.getElementById('exportText').textContent=text;
   document.getElementById('exportModal').classList.add('show');
 }
@@ -535,7 +566,7 @@ async function fetchData(){
 async function doRefresh(){
   const btn=document.getElementById('refreshBtn');
   btn.classList.add('spinning');
-  document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div style="font-size:13px">Scraping en cours...</div><div class="loading-status" id="loadingStatus">Connexion aux plateformes...</div></div>';
+  document.getElementById('termList').innerHTML='<div class="state-box"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div style="font-size:13px">Scraping en cours...</div><div class="loading-status" id="loadingStatus"></div></div>';
   try{
     await fetch(SERVER+'/api/refresh',{method:'POST'});
     const startTime=Date.now();
